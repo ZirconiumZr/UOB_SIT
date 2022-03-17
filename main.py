@@ -21,7 +21,7 @@ from pyannote.audio import Pipeline as pa_Pipeline
 from pydub import AudioSegment
 
 
-import uob_audiosegmentation, uob_noisereduce, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils
+import uob_audiosegmentation, uob_noisereduce, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils, uob_label
 from init import (
     pretrained_model_path,
     AUDIO_NAME,
@@ -215,10 +215,23 @@ stt_model_vosk_rec = uob_stt.load_stt_model(stt_model='vosk',pretrained_model_pa
 print('*'*30)
 print('STT Conversion Start')
 stt = uob_mainprocess.stt_process(slices_path=slices_path, rec=stt_model_vosk_rec,sr = STT_SAMPLERATE)
-        
+print('*'*30)
+print('STT Conversion Done')
+
+### merge SD and STT
+transactionDf = pd.merge(left = final_sd_result, right = stt, on="index",how='left')
+
+
+###  Speaker Labelling
+print('*'*30)
+print("Speaker Labelling Start")
+final = uob_mainprocess.speaker_label_func(transactionDf,pretrained_model_path=os.path.join(pretrained_model_path,'label/label_wordvector_model'),checklist_path=os.path.join(pretrained_model_path,'label/'))
+print('*'*30)
+print("Speaker Labelling Done")
+
+
 # print(stt)
 # print(final_sd_result)
-final = pd.merge(left = final_sd_result, right = stt, on="index",how='left')
 print(final)
 final.to_csv('output.csv')
 
