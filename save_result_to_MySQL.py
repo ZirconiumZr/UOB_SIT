@@ -12,7 +12,7 @@ SIT_result=SIT_result.fillna(0)
 # Connect to the database
 connection= pymysql.connect(host='localhost',
                             user='root',
-                            password='password',#Here fill in the code set up by the mysql database administrator
+                            password='password',#Here fill in the password set up by the mysql database administrator
                             database='UOBtests',
                             charset='utf8mb4',
                             cursorclass=pymysql.cursors.DictCursor)
@@ -32,7 +32,7 @@ with connection:
 
 connection= pymysql.connect(host='localhost',
                             user='root',
-                            password='password',#Here fill in the code set up by the mysql database administrator
+                            password='password',#Here fill in the password set up by the mysql database administrator
                             database='UOBtests',
                             charset='utf8mb4',
                             cursorclass=pymysql.cursors.DictCursor)
