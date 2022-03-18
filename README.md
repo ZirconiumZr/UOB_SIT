@@ -1,6 +1,6 @@
 # Guidance
-First, connect python with MySQL (Different compilers have different methods)
-Second, run the .sql in python to build one database and two tables inside
+First, connect python with MySQL (Different compilers have different methods) \n
+Second, run the create_UOB_databases.sql in python to build one database and two tables inside
 Third, run the .py in python to store the analysis results in Mysql database
 
 # MySQL database
