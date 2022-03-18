@@ -14,7 +14,7 @@ CREATE TABLE `UOBtests`.`TBL_AUDIO`(
                                        `path_orig` varchar(100)  NOT NULL,
                                        `path_processed` varchar(100),
                                        `create_by` varchar(20),
-                                       `create_date` date,
+                                       `create_date` varchar(20),
                                        `create_time` time,
                                        PRIMARY KEY (`audio_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=1 ;#Specify the initial value of the self-increment: 1
@@ -37,7 +37,7 @@ CREATE TABLE `UOBtests`.`TBL_STT_RESULT`(
                                     `text` varchar(5000),
                                     `save_path` varchar(100),
                                     `create_by` varchar(20),
-                                    `create_date` date,
+                                    `create_date` varchar(20),
                                     `create_time` time,
                                     PRIMARY KEY (`audio_id`,`slice_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
