@@ -3,7 +3,7 @@ UOB_SIT_Version
 
 # MySQL database
 In the database `UOBtests`:
-![table_relationships](https://user-images.githubusercontent.com/92351624/158938624-02c3238d-78df-4576-85b9-e287a36b7fc4.png)
+![table_relationships](https://user-images.githubusercontent.com/92351624/158938813-6b8ac5c8-dcdc-415e-944e-4c9b3ec1df92.png)
 
 table `TBL_AUDIO`
 ![image](https://user-images.githubusercontent.com/92351624/158938451-d55b7bb8-e643-4e5a-a8f2-b9a56df4cbb5.png)
