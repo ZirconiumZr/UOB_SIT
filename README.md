@@ -1,7 +1,9 @@
 # Guidance
-First, connect python with MySQL (Different compilers have different methods) \n
+First, connect python with MySQL (Different compilers have different methods) 
+
 Second, run the create_UOB_databases.sql in python to build one database and two tables inside
-Third, run the .py in python to store the analysis results in Mysql database
+
+Third, run the save_result_to_MySQL.py in python to store the analysis results in Mysql database
 
 # MySQL database
 In the database `UOBtests`:
