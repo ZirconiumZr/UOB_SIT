@@ -16,3 +16,7 @@ table `TBL_AUDIO`
 table `TBL_STT_RESULT`
 ![image](https://user-images.githubusercontent.com/92351624/158943366-12de7a18-d870-4367-912f-262f9a5db5be.png)
 
+
+The example in the code is stored in MySQL
+![image](https://user-images.githubusercontent.com/92351624/158958175-3dc99f8e-ce2e-410f-9fdb-f30a167a794d.png)
+![image](https://user-images.githubusercontent.com/92351624/158958211-8b370de5-5399-44d7-9b72-09242cc3bb93.png)
