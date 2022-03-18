@@ -23,8 +23,13 @@ from init import (
 # checklist = "checklist.txt"
 
 # Pre-processing a document.
+import nltk
 from nltk import word_tokenize
-# download('punkt')  # Download data for tokenizer. Should already download via Requirement.txt.
+# download('punkt')  # Download data for tokenizer.
+try:
+  nltk.data.find('tokenizers/punkt')
+except LookupError:
+  nltk.download('punkt')
 
 def speaker_label_func(input, pretrained_model_path, checklist_path):
     def preprocess(doc):
