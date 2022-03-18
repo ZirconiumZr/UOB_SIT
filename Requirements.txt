@@ -19,3 +19,5 @@ filetype==1.0.10
 gensim==4.1.2
 
 pyemd==0.5.1
+
+numpy==1.21.5
