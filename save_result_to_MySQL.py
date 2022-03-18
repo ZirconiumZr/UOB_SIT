@@ -3,8 +3,8 @@ import pymysql.cursors
 import time
 import pandas as pd
 import os
-path=r'/Users/ruiqianli/Desktop/UOB internship/Speaker_diarization'
-file=os.path.join(path, "dental_malaya.csv")
+path=r'/Users/ruiqianli/Desktop/UOB internship/Speaker_diarization' #Path to store csv files
+file=os.path.join(path, "dental_malaya.csv") 
 SIT_result=pd.read_csv(file)
 SIT_result=SIT_result.fillna(0)
 
