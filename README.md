@@ -1,5 +1,7 @@
-# UOB_SIT
-UOB_SIT_Version
+# Guidance
+First, connect python with MySQL (Different compilers have different methods)
+Second, run the .sql in python to build one database and two tables inside
+Third, run the .py in python to store the analysis results in Mysql database
 
 # MySQL database
 In the database `UOBtests`:
