@@ -23,9 +23,9 @@ Meanwhile, comment/uncomment below highlighted line accordingly. (Comment when u
  
  3. For error with package "pyemd" may meet, please read doc "pyemd_problem_solution.docx".
  
- 4. unzipped "punkt.zip" in path C:\Users\<youraccount>\AppData\Roaming\nltk_data\tokenizers
+ 4. unzipped "punkt.zip" in path C:\Users\<<youraccount>>\AppData\Roaming\nltk_data\tokenizers
  may need create new folder 'tokenizers', make sure the final path of punkt folder is:
- C:\Users\<youraccount>\AppData\Roaming\nltk_data\tokenizers\punkt
+ C:\Users\<<youraccount>>\AppData\Roaming\nltk_data\tokenizers\punkt
 
 
 
