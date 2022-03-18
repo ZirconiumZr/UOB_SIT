@@ -8,7 +8,6 @@ Original file is located at
 """
 import pandas as pd
 from pyemd import emd
-from gensim.similarities import WmdSimilarity
 from gensim.models import Word2Vec
 from init import (
     label_stop_words,
@@ -16,7 +15,7 @@ from init import (
 )
 # Import and download stopwords from NLTK.
 # from nltk.corpus import stopwords
-from nltk import download
+# from nltk import download
 # download('stopwords')  # Download stopwords list.
 # stop_words = stopwords.words('english')
 # or custom stopwords
@@ -25,7 +24,7 @@ from nltk import download
 
 # Pre-processing a document.
 from nltk import word_tokenize
-download('punkt')  # Download data for tokenizer.
+# download('punkt')  # Download data for tokenizer. Should already download via Requirement.txt.
 
 def speaker_label_func(input, pretrained_model_path, checklist_path):
     def preprocess(doc):
