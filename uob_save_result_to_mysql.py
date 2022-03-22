@@ -23,9 +23,9 @@ def dbInsert(finalDf):
             sql1 = "INSERT INTO `TBL_AUDIO` ( `audio_name`,`path_orig`,`path_processed`,`create_date`,`create_time`) VALUES (%s, %s, %s, %s, %s)"
             cursor.execute(sql1, ('dental_malaya',temSdPath,temSdPath,time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S")))
 
-        # connection is not autocommit by default. So you must commit to save your changes.
-        connection.commit()
-        audio_id_1=cursor.lastrowid
+            # connection is not autocommit by default. So you must commit to save your changes.
+            connection.commit()
+            audio_id_1=cursor.lastrowid
         
         #second: store result data to TBL_STT_RESULT table
         #from dataframe"output" to get the SD, STT and label results
