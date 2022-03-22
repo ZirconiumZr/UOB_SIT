@@ -131,7 +131,7 @@ if chunksfolder != '':
                                                 pipeline=pa_pipeline,
                                                 chunks=True, #fixed
                                                 reducenoise=False,
-                                                sd_proc='malaya')  # ?: [pyannoteaudio, malaya]
+                                                sd_proc='pyannoteaudio')  # ?: [pyannoteaudio, malaya]
             
             
             # ### * Cut audio by SD result
@@ -171,7 +171,7 @@ else:
                                         pipeline=pa_pipeline,
                                         chunks=False, #fixed
                                         reducenoise=False, 
-                                        sd_proc='malaya')  # ?: [pyannoteaudio, malaya]
+                                        sd_proc='pyannoteaudio')  # ?: [pyannoteaudio, malaya]
     
     # ### * Cut audio by SD result
     # namef, namec = os.path.splitext(AUDIO_NAME)
@@ -233,7 +233,7 @@ print("Speaker Labelling Done")
 # print(stt)
 # print(final_sd_result)
 print(final)
-final.to_csv('output.csv')
+final.to_csv(os.path.splitext(AUDIO_NAME)[0] + '_output.csv')
 
 
 
