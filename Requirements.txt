@@ -1,5 +1,0 @@
-pip install gensim==4.1.2
-
-python -c "import nltk; nltk.download('punkt')"
-
-pip install pyemd==0.5.1
