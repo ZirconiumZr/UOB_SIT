@@ -1,12 +1,20 @@
-from uob_dbConnect import connectDB
+import pymysql.cursors
 import time
 import pandas as pd
 from init import (
-    temSdPath
+    temSdPath,
+    dbName,
+    dbPwd
 )
 
 def dbInsert(finalDf):
-    connection = connectDB
+    connection= pymysql.connect(host='localhost',
+                        user='root',
+                        password= dbPwd,#Here fill in the password set up by the mysql database administrator
+                        database= dbName,
+                        charset='utf8mb4',
+                        cursorclass=pymysql.cursors.DictCursor)
+                        
     resultDf=finalDf.fillna(0)
     with connection:
         with connection.cursor() as cursor:
