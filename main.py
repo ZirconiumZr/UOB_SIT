@@ -235,9 +235,12 @@ print("Speaker Labelling Done")
 print(final)
 final.to_csv(os.path.splitext(AUDIO_NAME)[0] + '_output.csv')
 
-
-
-
+### Store output to database
+print('*'*30)
+print("Insert Output to Database Start")
+uob_mainprocess.dbInsert_func(final)
+print('*'*30)
+print("Insert Output to Database Done")
 
 # Clear variables
 sd_global_starttime = 0.0
