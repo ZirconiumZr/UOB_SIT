@@ -24,7 +24,7 @@ with connection:
         cursor.execute(sql1, ('dental_malaya','/Users/ruiqianli/Desktop/UOB internship/Speaker_diarization','/Users/ruiqianli/Desktop/UOB internship/Speaker_diarization',time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S")))
 
        # connection is not autocommit by default. So you must commit to save your changes.
-       connection.commit()
+       # connection.commit()
        audio_id_1=cursor.lastrowid
       
        #second: store result data to TBL_STT_RESULT table
