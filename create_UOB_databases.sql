@@ -10,10 +10,10 @@ create database UOBtests;
 
 CREATE TABLE `UOBtests`.`TBL_AUDIO`(
                                        `audio_id` int NOT NULL AUTO_INCREMENT,
-                                       `audio_name` varchar(20)  NOT NULL,
+                                       `audio_name` varchar(50)  NOT NULL,
                                        `path_orig` varchar(100)  NOT NULL,
                                        `path_processed` varchar(100),
-                                       `create_by` varchar(20),
+                                       `create_by` varchar(50),
                                        `create_date` varchar(20),
                                        `create_time` time,
                                        PRIMARY KEY (`audio_id`)
@@ -36,7 +36,7 @@ CREATE TABLE `UOBtests`.`TBL_STT_RESULT`(
                                     `speaker_label` varchar(20)  NOT NULL,
                                     `text` varchar(5000),
                                     `save_path` varchar(100),
-                                    `create_by` varchar(20),
+                                    `create_by` varchar(50),
                                     `create_date` varchar(20),
                                     `create_time` time,
                                     PRIMARY KEY (`audio_id`,`slice_id`)
