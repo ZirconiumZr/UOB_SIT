@@ -65,8 +65,8 @@ def speaker_label_func(transactionDf, pretrained_model_path, checklist_path):
     label_result = uob_label.speaker_label_func(transactionDf, pretrained_model_path, checklist_path)
     return label_result
 
-def dbInsert_func(finalDf):
-    uob_save_result_to_mysql.dbInsert(finalDf)
+def dbInsert_func(finalDf, slices_path):
+    uob_save_result_to_mysql.dbInsert(finalDf, slices_path)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                       Functions                                     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

@@ -238,7 +238,7 @@ final.to_csv(os.path.splitext(AUDIO_NAME)[0] + '_output.csv')
 ### Store output to database
 print('*'*30)
 print("Insert Output to Database Start")
-uob_mainprocess.dbInsert_func(final)
+uob_mainprocess.dbInsert_func(final, slices_path)
 print('*'*30)
 print("Insert Output to Database Done")
 
