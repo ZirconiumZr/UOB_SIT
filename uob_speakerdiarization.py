@@ -129,7 +129,7 @@ def speaker_change_detection( speaker_vector, grouped_vad, y, sr,
                              frame_duration_ms=500, min_clusters = 2, max_clusters = 5):
         
     # speakernet = malaya_speech.speaker_change.deep_model('speakernet')
-    speakernet = uob_extractmodel.get_model_speaker_change(model='speakernet')
+    speakernet = uob_extractmodel.get_model_speaker_change(model='speakernet') #TODO: to move to main.py?
     frames_speaker_change = list(malaya_speech.utils.generator.frames(y, frame_duration_ms, sr))
     probs_speakernet = [(frame, speakernet.predict_proba([frame])[0, 1]) for frame in frames_speaker_change] # !: check function 'predict_proba' for all models.-->'Speaker2Vec' object has no attribute 'predict_proba'
     
@@ -176,7 +176,7 @@ def visualization_sd(y, grouped_vad, sr, result_diarization):
 def pyannoteaudio_speaker_diarization(audiofile, pipeline):
     # pipeline = pa_Pipeline.from_pretrained('pyannote/speaker-diarization')
     own_file = {'audio': audiofile}
-    diarization_result = pipeline(own_file)
+    diarization_result = pipeline(own_file, num_speakers=2)
     # print(diarization_result)  # TODO: comment
     # diarization_result #--> Can only visualize in notebook
     # for turn, xxx, speaker in diarization_result.itertracks(yield_label=True):

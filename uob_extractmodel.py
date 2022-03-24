@@ -104,7 +104,7 @@ def get_model_noisereduce(pretrained_model_path = pretrained_model_path, model='
                             module=module,
                             keys={'model': 'model.pb'},
                             validate=True,
-                            quantized=False,
+                            quantized=quantized,
                             **kwargs,
                         )
     print(path_dict)
@@ -121,6 +121,81 @@ def get_model_noisereduce(pretrained_model_path = pretrained_model_path, model='
 
     return model_object
 
+
+def get_model_speechenhancement(pretrained_model_path = pretrained_model_path, model='unet', quantized:bool=False, **kwargs):
+    '''
+    available models:
+        * ``'unet'`` - pretrained UNET Speech Enhancement.
+        * ``'resnet-unet'`` - pretrained resnet-UNET Speech Enhancement.
+        * ``'resnext-unet'`` - pretrained resnext-UNET Speech Enhancement.
+    '''
+    _sampling_availability = {
+        'unet': {
+            'Size (MB)': 40.7,
+            'Quantized Size (MB)': 10.3,
+            'SDR': 9.877178,
+            'ISR': 15.916217,
+            'SAR': 13.709130,
+        },
+        'resnet-unet': {
+            'Size (MB)': 36.4,
+            'Quantized Size (MB)': 9.29,
+            'SDR': 9.43617,
+            'ISR': 16.86103,
+            'SAR': 12.32157,
+        },
+        'resnext-unet': {
+            'Size (MB)': 36.1,
+            'Quantized Size (MB)': 9.26,
+            'SDR': 9.685578,
+            'ISR': 16.42137,
+            'SAR': 12.45115,
+        },
+    }
+    
+    ## Check model availability
+    model = model.lower()
+    if model not in _sampling_availability:
+        raise ValueError(
+            'model not supported, please check supported models from `malaya_speech.speech_enhancement.available_deep_enhance()`.'
+        )
+
+    ## Declare model file
+    module = 'speech-enhancement'
+    path = pretrained_model_path
+    if quantized:
+        path = os.path.join(module, f'{model}-quantized')
+        quantized_path = os.path.join(path, 'model.pb')
+        modelfile = os.path.join(pretrained_model_path, quantized_path).replace('\\', '/')
+        # print('true')
+    else:
+        path = os.path.join(module, model, 'model.pb')
+        modelfile = os.path.join(pretrained_model_path, path).replace('\\', '/')
+        # print('false')
+    
+    # print(modelfile)
+    ## Check if model.pb exists
+    path_dict = check_file(
+                            model=model,
+                            base_path=pretrained_model_path,
+                            module=module,
+                            keys={'model': 'model.pb'},
+                            validate=True,
+                            quantized=quantized,
+                            **kwargs,
+                            )
+    print(path_dict)
+    
+    model_object = load_1d(
+        modelfile=modelfile,
+        model=model,
+        module=module,
+        quantized=quantized,
+        **kwargs
+    )
+    
+    return model_object
+    
 
 
 def get_model_vad(pretrained_model_path = pretrained_model_path, model = 'vggvox-v2', quantized:bool=False, **kwargs):
@@ -195,7 +270,7 @@ def get_model_vad(pretrained_model_path = pretrained_model_path, model = 'vggvox
                                 module=module,
                                 keys={'model': 'model.pb'},
                                 validate=True,
-                                quantized=False,
+                                quantized=quantized,
                                 **kwargs,
                             )
     print(path_dict)
@@ -294,7 +369,7 @@ def get_model_speaker_vector(pretrained_model_path = pretrained_model_path, mode
                                     module=module,
                                     keys={'model': 'model.pb'},
                                     validate=True,
-                                    quantized=False,
+                                    quantized=quantized,
                                     **kwargs,
                                 )
     print(path_dict)
@@ -361,7 +436,7 @@ def get_model_speaker_change(pretrained_model_path = pretrained_model_path, mode
                                     module=module,
                                     keys={'model': 'model.pb'},
                                     validate=True,
-                                    quantized=False,
+                                    quantized=quantized,
                                     **kwargs,
                                 )
     print(path_dict)
@@ -544,6 +619,27 @@ def check_files_local(file):
             return False
     return True  
     
+
+def load_1d(modelfile, model, module, quantized=False, **kwargs):
+    # path = check_file(
+    #     file=model,
+    #     module=module,
+    #     keys={'model': 'model.pb'},
+    #     quantized=quantized,
+    #     **kwargs,
+    # )
+    g = load_graph(modelfile, **kwargs)
+    inputs = ['Placeholder']
+    outputs = ['logits']
+    input_nodes, output_nodes = nodes_session(g, inputs, outputs)
+
+    return UNET1D(
+        input_nodes=input_nodes,
+        output_nodes=output_nodes,
+        sess=generate_session(graph=g, **kwargs),
+        model=model,
+        name=module,
+    )
 
 
 

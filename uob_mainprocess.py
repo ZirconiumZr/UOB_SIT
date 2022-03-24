@@ -18,9 +18,9 @@ import os
 import numpy as np
 from datetime import datetime
 
-import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_label, uob_save_result_to_mysql
+import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement,  uob_label, uob_save_result_to_mysql
 
-def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, sd_proc='pyannoteaudio'):
+def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, sd_proc='pyannoteaudio'):
     ## Reduce noise
     if reducenoise == True:
         ## load nr models
@@ -41,6 +41,24 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, vad_model=
             audioname = '%s.%s'%(namef+'_nr',namec)
             sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
     
+    
+    ## Speech Enhancement
+    if speechenhance == True:
+        y = malaya_speech_enhance(y, sr, se_model=se_model)
+        
+        if chunks:
+            namef, namec = os.path.splitext(audioname)
+            namef_other, namef_index = namef.rsplit("_", 1)
+            namef_index = int(namef_index)
+            namec = namec[1:]
+            audioname = '%s_%04d.%s'%(namef_other+'_se',namef_index,namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+        else:
+            namef, namec = os.path.splitext(audioname)
+            namec = namec[1:]
+            audioname = '%s.%s'%(namef+'_se',namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+        
     
     ## Speaker Diarization
     if sd_proc == 'malaya':
@@ -86,7 +104,13 @@ def malaya_reduce_noise(y, sr, nr_model):
     noisereduced_audio = uob_noisereduce.output_voice_pipeline(y, sr, nr_model, frame_duration_ms=15000)
     y = noisereduced_audio
     return y
-    
+
+
+def malaya_speech_enhance(y, sr, se_model):
+    ### * Enhance the Speech
+    speechenhanced_audio =uob_speechenhancement.get_se_output(y, sr, se_model)
+    y = speechenhanced_audio
+    return y
     
     
 def malaya_sd(y, sr, audioname, audiopath, vad_model, sv_model):  
@@ -102,7 +126,7 @@ def malaya_sd(y, sr, audioname, audiopath, vad_model, sv_model):
     ### * Speaker Diarization
     ## Load SD model + VAD
     # model_speakernet, model_vggvox2 = uob_speakerdiarization.load_speaker_vector()
-    grouped_vad = uob_speakerdiarization.load_vad(y, sr, vad_model = vad_model, frame_duration_ms=30, threshold_to_stop=0.3)
+    grouped_vad = uob_speakerdiarization.load_vad(y, sr, vad_model = vad_model, frame_duration_ms=30, threshold_to_stop=0.5)
     speaker_vector = sv_model #model_speakernet
 
     
@@ -110,10 +134,13 @@ def malaya_sd(y, sr, audioname, audiopath, vad_model, sv_model):
     # ?: choose a SD function below, comment others
     # result_sd = uob_speakerdiarization.speaker_similarity(speaker_vector, grouped_vad)
     # result_sd = uob_speakerdiarization.affinity_propagation(speaker_vector, grouped_vad)
-    result_sd = uob_speakerdiarization.spectral_clustering(speaker_vector, grouped_vad, min_clusters=2, max_clusters=3) #!p_percentile issue
-    # result_sd = uob_speakerdiarization.n_speakers_clustering(speaker_vector, grouped_vad, n_speakers=3, model='kmeans') #['spectralcluster','kmeans']
+    result_sd = uob_speakerdiarization.spectral_clustering(speaker_vector, grouped_vad, min_clusters=2, max_clusters=2) #!p_percentile issue
+    # result_sd = uob_speakerdiarization.n_speakers_clustering(speaker_vector, grouped_vad, n_speakers=2, model='kmeans') #['spectralcluster','kmeans']
     # result_sd = uob_speakerdiarization.speaker_change_detection(speaker_vector, grouped_vad, y, sr,frame_duration_ms=500, 
-    #                                                           min_clusters = 2, max_clusters = 3) #!p_percentile issue
+    #                                                           min_clusters = 2, max_clusters = 2) #!p_percentile issue
+    
+    ## Visualization #TODO: to comment for production
+    uob_speakerdiarization.visualization_sd(y, grouped_vad, sr, result_sd)
     
     
     ## Get timestamp
@@ -133,15 +160,12 @@ def malaya_sd(y, sr, audioname, audiopath, vad_model, sv_model):
         result_timestamp = [int(index), float(i[0].timestamp), float(end), float(i[0].duration),str(i[1])]
         result_timestamps.append(result_timestamp)
 
-    namef, namec = os.path.splitext(audioname)
-    # namef_other, namef_index = namef.rsplit("_", 1)
-    # save_name = '%s_%04d.%s'%(namef_other,namef_index,'csv')
-    namec = namec[1:]
-    save_name = '%s_%s.%s'%(namef, datetime.now().strftime('%y%m%d-%H%M%S'), 'csv')
-    np.savetxt(os.path.join(audiopath,save_name), result_timestamps,
-               delimiter=',', fmt='% s')
-    
-    # TODO: convert to common format
+    # # Remove "Save" after integration
+    # namef, namec = os.path.splitext(audioname)
+    # namec = namec[1:]
+    # save_name = '%s_%s.%s'%(namef, datetime.now().strftime('%y%m%d-%H%M%S'), 'csv')
+    # np.savetxt(os.path.join(audiopath,save_name), result_timestamps,
+    #            delimiter=',', fmt='% s')
     
     # return diarization_result
     return result_timestamps
@@ -173,15 +197,12 @@ def pyannoteaudio_sd(audioname, audiopath, audiofile, pa_pipeline):
         result_timestamp = [int(index), float(turn.start), float(turn.end), float(turn.end-turn.start), str(speaker)]
         result_timestamps.append(result_timestamp)
 
-    namef, namec = os.path.splitext(audioname)
-    # namef_other, namef_index = namef.rsplit("_", 1)
-    # save_name = '%s_%04d.%s'%(namef_other,namef_index,'csv')
-    namec = namec[1:]
-    save_name = '%s_%s.%s'%(namef, datetime.now().strftime('%y%m%d-%H%M%S'), 'csv')
-    np.savetxt(os.path.join(audiopath,save_name), result_timestamps,
-               delimiter=',', fmt='% s')
-    
-    # TODO: convert to common format
+    # # Remove "Save" after integration
+    # namef, namec = os.path.splitext(audioname)
+    # namec = namec[1:]
+    # save_name = '%s_%s.%s'%(namef, datetime.now().strftime('%y%m%d-%H%M%S'), 'csv')
+    # np.savetxt(os.path.join(audiopath,save_name), result_timestamps,
+    #            delimiter=',', fmt='% s')
     
     # return diarization_result
     return result_timestamps
