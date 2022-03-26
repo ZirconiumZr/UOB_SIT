@@ -152,7 +152,7 @@ if chunksfolder != '':
                                                 chunks=True, #fixed
                                                 reducenoise=FLG_REDUCE_NOISE,
                                                 speechenhance=FLG_SPEECH_ENHANCE,
-                                                sd_proc='malaya')  # ?: [pyannoteaudio, malaya]
+                                                sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
             
             
             # ### * Cut audio by SD result
@@ -197,7 +197,7 @@ else:
                                         chunks=False, #fixed
                                         reducenoise=FLG_REDUCE_NOISE, 
                                         speechenhance=FLG_SPEECH_ENHANCE,
-                                        sd_proc='malaya')  # ?: [pyannoteaudio, malaya]
+                                        sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
     
     # ### * Cut audio by SD result
     # namef, namec = os.path.splitext(AUDIO_NAME)
