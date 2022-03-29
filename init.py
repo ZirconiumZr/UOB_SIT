@@ -13,8 +13,10 @@ FLG_SPEECH_ENHANCE:bool = False
 
 label_stop_words = 'nan'
 label_checklist = 'checklist.txt'
-temSdPath = '/Users/ruiqianli/Desktop/UOB internship/Speaker_diarization'
+
+dbHost = 'localhost'
 dbName = 'UOBtests'
+dbUser = 'root'
 dbPwd = 'password'
 
 sd_global_starttime = 0.0

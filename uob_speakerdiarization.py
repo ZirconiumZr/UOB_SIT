@@ -198,7 +198,7 @@ def resemblyzer_speaker_diarization(cont_embeds, wav_splits) -> pd.DataFrame:
 
     clusterer = SpectralClusterer(
         min_clusters=2,
-        max_clusters=100,
+        max_clusters=2,
         # p_percentile=0.85,   #Latest SpectralCluster package removes this two params.
         # gaussian_blur_sigma=1
         )
