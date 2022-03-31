@@ -33,7 +33,8 @@ from init import (
     STT_SAMPLERATE,
     FLG_REDUCE_NOISE,
     FLG_SPEECH_ENHANCE,
-    sd_global_starttime
+    sd_global_starttime,
+    sttModel
 )
 
 
@@ -86,8 +87,10 @@ print('*' * 30)
 print('length:',orig_nframes, 'sample rate:', orig_samplerate, 'duration(s):',audio_duration)
 print('*' * 30)
 
-
-
+# print('*' * 30)
+# uob_utils.volIncrease(AUDIO_NAME,AUDIO_PATH)
+# print('standardize Audio Done')
+# print('*' * 30)
 #### * Load SD models
 ## Noise reduce models
 # nr_model = uob_noisereduce.load_noisereduce_model(quantized=False)
@@ -269,18 +272,16 @@ print('*'*30, 'Cut Slices Done')
 
 ###  Speech to Text Conversion
 ## Load VOSK model
-stt_model_vosk_rec = uob_stt.load_stt_model(stt_model='vosk',pretrained_model_path=os.path.join(pretrained_model_path,'stt/model'), sr=STT_SAMPLERATE)
+stt_model = uob_stt.load_stt_model(stt_model = sttModel, pretrained_model_path=os.path.join(pretrained_model_path,'stt/model'), sr=STT_SAMPLERATE)
 ## STT start
 print('*'*30)
 print('STT Conversion Start')
-stt = uob_mainprocess.stt_process(slices_path=slices_path, rec=stt_model_vosk_rec, sr = STT_SAMPLERATE)
+stt = uob_mainprocess.stt_process(sttModel = sttModel, slices_path=slices_path, rec=stt_model, sr = STT_SAMPLERATE)
 print('*'*30)
 print('STT Conversion Done')
 
 ### merge SD and STT
 transactionDf = pd.merge(left = final_sd_result, right = stt, on="index",how='left')
-
-
 ###  Speaker Labelling
 print('*'*30)
 print("Speaker Labelling Start")

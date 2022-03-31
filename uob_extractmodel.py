@@ -475,7 +475,11 @@ def get_model_stt_vosk(pretrained_model_path=pretrained_model_path, sr=16000):
     rec = KaldiRecognizer(model, sr)
     
     return model, rec
-
+    
+def get_model_stt_malaya_speech():
+    import malaya_speech
+    model = malaya_speech.stt.deep_transducer(model = 'large-conformer-singlish')
+    return model
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                        Utils                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

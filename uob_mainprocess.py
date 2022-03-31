@@ -24,6 +24,7 @@ from resemblyzer.hparams import *
 import os
 import numpy as np
 from datetime import datetime
+import subprocess as sub
 
 import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage
 
@@ -34,6 +35,7 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
         # nr_model, nr_quantized_model = uob_noisereduce.load_noisereduce_model(modelname='resnet-unet')
         # start to process
         y = malaya_reduce_noise(y, sr, nr_model=nr_model)
+        # y = volIncrease(audioname,audiopath)
         
         if chunks:
             namef, namec = os.path.splitext(audioname)
@@ -85,9 +87,19 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
 
     return sd_result
 
-def stt_process(slices_path, rec, sr):
+def volIncrease(audioname,audiopath):
+    audiofile = os.path.join(audiopath, audioname)
+    temoutputfile = os.path.join(audiopath, 'temp_output.wav')
+    sub.call(["sox","-v","2.0",audiofile,temoutputfile])
+    os.remove(audiofile)
+    os.rename(temoutputfile,audiofile)
+
+def stt_process(sttModel, slices_path, rec, sr):
+    if sttModel == 'VOSK':
     # TODO: standardize audios for VOSK STT conversion
-    stt_result = uob_stt.stt_conversion_vosk(slices_path, rec, sr)
+        stt_result = uob_stt.stt_conversion_vosk(slices_path, rec, sr)
+    elif sttModel == 'malaya-speech':
+        stt_result = uob_stt.stt_conversion_malaya_speech(slices_path, rec)
     return stt_result
 
 def speaker_label_func(transactionDf, pretrained_model_path, checklist_path):

@@ -20,8 +20,8 @@ dbUser = 'root'
 dbPwd = 'password'
 
 sd_global_starttime = 0.0
-
-
+sttModel = 'malaya-speech'
+# 'malaya-speech' 'VOSK'
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                              Initialization  Processes                              #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

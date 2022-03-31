@@ -3,6 +3,7 @@ from typing import Any, Optional
 from pydub import AudioSegment
 import wave
 import filetype # to check file type
+import subprocess as sub
 
 def check_file_type(audioname, audiopath):
     audiofile = os.path.join(audiopath, audioname)
@@ -65,3 +66,9 @@ def standardize_audio(from_audioname, from_audiopath, to_audioname, to_audiopath
     AudioSegment.from_wav(from_audiofile).set_frame_rate(sample_rate).set_channels(no_of_channel).export(to_audiofile,format='wav')
     
 
+def volIncrease(audioname,audiopath):
+    audiofile = os.path.join(audiopath, audioname)
+    temoutputfile = os.path.join(audiopath, 'temp_output.wav')
+    sub.call(["sox","-v","0.9",audiofile,temoutputfile])
+    os.remove(audiofile)
+    os.rename(temoutputfile,audiofile)
