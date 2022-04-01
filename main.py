@@ -271,8 +271,9 @@ else:
 print('*'*30, 'Cut Slices Done')
 
 ###  Speech to Text Conversion
-## Load VOSK model
+## Load VOSK  or malaya_speech model
 stt_model = uob_stt.load_stt_model(stt_model = sttModel, pretrained_model_path=os.path.join(pretrained_model_path,'stt/model'), sr=STT_SAMPLERATE)
+
 ## STT start
 print('*'*30)
 print('STT Conversion Start')

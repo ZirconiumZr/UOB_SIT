@@ -3,7 +3,7 @@ import os
 
 pretrained_model_path = './pretrained-model/'
 
-AUDIO_NAME = 'RT048_bankaccount_150-249.wav' #'Bdb001_interaction_first60s.wav'
+AUDIO_NAME = 'F_0101_15y2m_1-bk.wav' #'Bdb001_interaction_first60s.wav'
 AUDIO_PATH = './wav/'
 AUDIO_FILE = os.path.join(AUDIO_PATH,AUDIO_NAME)
 SAMPLE_RATE = 44100

@@ -35,7 +35,7 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
         # nr_model, nr_quantized_model = uob_noisereduce.load_noisereduce_model(modelname='resnet-unet')
         # start to process
         y = malaya_reduce_noise(y, sr, nr_model=nr_model)
-        # y = volIncrease(audioname,audiopath)
+        y = volIncrease(audioname,audiopath)
         
         if chunks:
             namef, namec = os.path.splitext(audioname)
@@ -90,7 +90,7 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
 def volIncrease(audioname,audiopath):
     audiofile = os.path.join(audiopath, audioname)
     temoutputfile = os.path.join(audiopath, 'temp_output.wav')
-    sub.call(["sox","-v","2.0",audiofile,temoutputfile])
+    sub.call(["sox","-v","0.9",audiofile,temoutputfile])
     os.remove(audiofile)
     os.rename(temoutputfile,audiofile)
 

@@ -38,6 +38,12 @@ from vosk import Model, KaldiRecognizer, SetLogLevel
 
 from init import pretrained_model_path
 import uob_noisereduce, uob_speakerdiarization  #for test
+from malaya_speech.path import TRANSDUCER_VOCABS, TRANSDUCER_MIXED_VOCABS
+from malaya_speech.utils.subword import load as subword_load
+from malaya_speech.utils.tf_featurization import STTFeaturizer
+from malaya_speech.utils.read import load as load_wav
+from malaya_speech.model.tf import Transducer, Wav2Vec2_CTC, TransducerAligner
+import malaya_speech
 
 
 
@@ -476,10 +482,157 @@ def get_model_stt_vosk(pretrained_model_path=pretrained_model_path, sr=16000):
     
     return model, rec
     
-def get_model_stt_malaya_speech():
-    import malaya_speech
-    model = malaya_speech.stt.deep_transducer(model = 'large-conformer-singlish')
-    return model
+# def get_model_stt_malaya_speech():
+#     model = malaya_speech.stt.deep_transducer(model = 'large-conformer-singlish')
+#     return model
+
+def get_model_stt_malaya_speech(
+    pretrained_model_path = pretrained_model_path, 
+    model='large-conformer-singlish',  
+    quantized:bool=False, 
+    **kwargs):
+    """
+    Parameters
+    ----------
+    model : str, optional (default='conformer')
+        Model architecture supported. Allowed values:
+
+        * ``'tiny-conformer'`` - TINY size Google Conformer.
+        * ``'small-conformer'`` - SMALL size Google Conformer.
+        * ``'conformer'`` - BASE size Google Conformer.
+        * ``'large-conformer'`` - LARGE size Google Conformer.
+        * ``'conformer-stack-2mixed'`` - BASE size Stacked Google Conformer for (Malay + Singlish) languages.
+        * ``'conformer-stack-3mixed'`` - BASE size Stacked Google Conformer for (Malay + Singlish + Mandarin) languages.
+        * ``'small-conformer-singlish'`` - SMALL size Google Conformer for singlish language.
+        * ``'conformer-singlish'`` - BASE size Google Conformer for singlish language.
+        * ``'large-conformer-singlish'`` - LARGE size Google Conformer for singlish language.
+
+    quantized : bool, optional (default=False)
+        if True, will load 8-bit quantized model.
+        Quantized model not necessary faster, totally depends on the machine.
+
+    Returns
+    -------
+    result : malaya_speech.model.tf.Transducer class
+    """
+    model = model.lower()
+    if model not in _transducer_availability:
+        raise ValueError(
+            'model not supported, please check supported models from `malaya_speech.stt.available_transducer()`.'
+        )
+
+    module='speech-to-text-transducer'
+    path = os.path.join(module, model, 'model.pb')
+    modelfile = os.path.join(pretrained_model_path, path).replace('\\', '/')
+    # path_dict = check_file(
+    #                         model=model,
+    #                         base_path=pretrained_model_path,
+    #                         module=module,
+    #                         keys={'model': 'model.pb'},
+    #                         validate=True,
+    #                         quantized=quantized,
+    #                         **kwargs,
+    #                     )
+    # print(path_dict)
+    return transducer_load(
+        modelfile=modelfile, 
+        model=model,
+        module='speech-to-text-transducer',
+        languages=_transducer_availability[model]['Language'],
+        quantized=quantized,
+        **kwargs
+    )
+    # return stt.transducer_load(
+    #     model=model,
+    #     module='speech-to-text-transducer',
+    #     languages=_transducer_availability[model]['Language'],
+    #     quantized=quantized,
+    #     **kwargs
+    # )
+
+_transducer_availability = {
+    'tiny-conformer': {
+        'Size (MB)': 24.4,
+        'Quantized Size (MB)': 9.14,
+        'WER': 0.2128108,
+        'CER': 0.08136871,
+        'WER-LM': 0.1996828,
+        'CER-LM': 0.0770037,
+        'Language': ['malay'],
+    },
+    'small-conformer': {
+        'Size (MB)': 49.2,
+        'Quantized Size (MB)': 18.1,
+        'WER': 0.19853302,
+        'CER': 0.07449528,
+        'WER-LM': 0.18536073,
+        'CER-LM': 0.07114307,
+        'Language': ['malay'],
+    },
+    'conformer': {
+        'Size (MB)': 125,
+        'Quantized Size (MB)': 37.1,
+        'WER': 0.1636023,
+        'CER': 0.0587443,
+        'WER-LM': 0.1561821,
+        'CER-LM': 0.0571897,
+        'Language': ['malay'],
+    },
+    'large-conformer': {
+        'Size (MB)': 404,
+        'Quantized Size (MB)': 107,
+        'WER': 0.1566839,
+        'CER': 0.0619715,
+        'WER-LM': 0.1486221,
+        'CER-LM': 0.0590102,
+        'Language': ['malay'],
+    },
+    'conformer-stack-2mixed': {
+        'Size (MB)': 130,
+        'Quantized Size (MB)': 38.5,
+        'WER': 0.1376717,
+        'CER': 0.0717507,
+        'WER-LM': None,
+        'CER-LM': None,
+        'Language': ['malay', 'singlish'],
+    },
+    'conformer-stack-3mixed': {
+        'Size (MB)': 130,
+        'Quantized Size (MB)': 38.5,
+        'WER': 0.27758773,
+        'CER': 0.1631205,
+        'WER-LM': None,
+        'CER-LM': None,
+        'Language': ['malay', 'singlish', 'mandarin'],
+    },
+    'small-conformer-singlish': {
+        'Size (MB)': 49.2,
+        'Quantized Size (MB)': 18.1,
+        'WER': 0.12771,
+        'CER': 0.0703953,
+        'WER-LM': None,
+        'CER-LM': None,
+        'Language': ['singlish'],
+    },
+    'conformer-singlish': {
+        'Size (MB)': 125,
+        'Quantized Size (MB)': 37.1,
+        'WER': 0.0963391,
+        'CER': 0.0545533,
+        'WER-LM': None,
+        'CER-LM': None,
+        'Language': ['singlish'],
+    },
+    'large-conformer-singlish': {
+        'Size (MB)': 404,
+        'Quantized Size (MB)': 107,
+        'WER': 0.0839525,
+        'CER': 0.0445617,
+        'WER-LM': None,
+        'CER-LM': None,
+        'Language': ['singlish'],
+    },
+}
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                        Utils                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -562,6 +715,112 @@ def load(modelfile, model, module, extra, label, quantized=False, **kwargs):
         name=module,
     )
 
+def transducer_load(modelfile, model, module, languages, quantized=False, stt=True, **kwargs):
+    splitted = model.split('-')
+    stack = False
+
+    if len(splitted) == 3:
+        stack = 'stack' == splitted[-2]
+
+    if stack:
+        keys = {'model': 'model.pb'}
+        for no, language in enumerate(languages):
+            keys[f'vocab_{no}'] = get_vocab_mixed(language)
+        path = check_file(
+            model=model,
+            base_path = pretrained_model_path,
+            module=module,
+            keys=keys,
+            quantized=quantized,
+            **kwargs,
+        )
+        vocab = []
+        for no, language in enumerate(languages):
+            vocab.append(subword_load(path[f'vocab_{no}'].replace('.subwords', '')))
+    else:
+        path = check_file(
+            model=model,
+            base_path = pretrained_model_path,
+            module=module,
+            keys={'model': 'model.pb', 'vocab': get_vocab(splitted[-1])},
+            quantized=quantized,
+            **kwargs,
+        )
+        vocab = subword_load(path['vocab'].replace('.subwords', ''))
+        print(vocab)
+    g = load_graph(modelfile, **kwargs)
+    featurizer = STTFeaturizer(normalize_per_feature=True)
+
+    if stt:
+        inputs = [
+            'X_placeholder',
+            'X_len_placeholder',
+            'encoded_placeholder',
+            'predicted_placeholder',
+            'states_placeholder',
+        ]
+        outputs = [
+            'encoded',
+            'ytu',
+            'new_states',
+            'padded_features',
+            'padded_lens',
+            'initial_states',
+            'greedy_decoder',
+            'non_blank_transcript',
+            'non_blank_stime',
+        ]
+        selected_model = Transducer
+    else:
+        inputs = [
+            'X_placeholder',
+            'X_len_placeholder',
+            'subwords',
+            'subwords_lens'
+        ]
+        outputs = [
+            'padded_features',
+            'padded_lens',
+            'non_blank_transcript',
+            'non_blank_stime',
+            'decoded',
+            'alignment'
+        ]
+        selected_model = TransducerAligner
+
+    input_nodes, output_nodes = nodes_session(g, inputs, outputs)
+    this_dir = str(malaya_speech.__file__).replace('\__init__.py','') + '\supervised'
+    wav1, _ = load_wav(os.path.join(this_dir, 'speech', '1.wav'))
+    wav2, _ = load_wav(os.path.join(this_dir, 'speech', '2.wav'))
+
+    return selected_model(
+        input_nodes=input_nodes,
+        output_nodes=output_nodes,
+        featurizer=featurizer,
+        vocab=vocab,
+        time_reduction_factor=time_reduction_factor.get(model, 4),
+        sess=generate_session(graph=g, **kwargs),
+        model=model,
+        name=module,
+        wavs=[wav1, wav2],
+        dummy_sentences=dummy_sentences,
+        stack=stack,
+    )
+
+def get_vocab_mixed(language):
+    return TRANSDUCER_MIXED_VOCABS.get(language)
+
+time_reduction_factor = {
+    'tiny-conformer': 4,
+    'small-conformer': 4,
+    'conformer': 4,
+    'large-conformer': 4,
+    'alconformer': 4,
+}
+dummy_sentences = ['tangan aku disentuh lembut', 'sebut perkataan angka']
+
+def get_vocab(language):
+    return TRANSDUCER_VOCABS.get(language, TRANSDUCER_VOCABS['malay'])
 
 def check_file(
     model,

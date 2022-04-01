@@ -76,7 +76,10 @@ def stt_conversion_malaya_speech(slices_path, rec):
             namef_index = int(namef_index)
             inputFile = slices_path+"/"+filename
             singlish, sr = malaya_speech.load(inputFile)
+            # greedy_decoder
             transcription = rec.greedy_decoder([singlish])
+            # beam_decoder
+            # transcription = rec.beam_decoder([singlish])
             transcription_text = ' '.join(transcription)
             stt.loc[len(stt)] = [namef_index, transcription_text,filename]
 
