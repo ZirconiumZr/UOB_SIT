@@ -6,7 +6,7 @@ SoX is used to adjust the audio format and will not be used in the process of tr
 
 ### For test data:
 
-#### Need one csv with 3 column:
+#### Need one csv with 3 column: (example: testdata.csv)
 
 wav_filename   ###absolute path
 
@@ -14,7 +14,7 @@ wav_filesize   ###audio size(kb)
 
 transcript   ###text
 
-#### Audio requirement:
+#### Audio requirement: (example: sample.zip)
 
 channel: 1 (mono)
 
