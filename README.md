@@ -2,6 +2,8 @@
 
 ## 1.deepspeech
 
+SoX is used to adjust the audio format and will not be used in the process of training the model, so it is not necessary to install it at present.
+
 ### For test data:
 
 #### Need one csv with 3 column:
