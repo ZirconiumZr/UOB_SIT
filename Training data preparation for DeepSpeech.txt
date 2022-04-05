@@ -1,0 +1,37 @@
+Training data preparation for DeepSpeech:
+
+Note: please write the needed csv file on the company laptop, later upload on internship2022 cloud folder. We will finally fine-tune the model on company Desktop computer
+
+Original audio: 181.wav   142.wav
+
+Take 181.wav for example:
+
+Step1:
+Transform the 181.wav to channel=1(mono), sample rate=16000
+
+Step2:
+Cut the 181.wav by sentences (now we use the Resemblyer SD result audio slices)
+(Note: step1 and step2 can change order, we can use slice to listen and write the transcript csv first and then write loops to do uniform formatting of audio slices)
+Zip those audio slices cut from 181.wav --> to 181.zip
+The files in zip:
+181/1.wav
+181/2.wav
+181/3.wav
+
+Step3:
+Write the testdata.csv, the format is as follows:
+181_testdata.csv:
+wav_filename	wav_filesize	transcript
+181/1.wav	218	the server is connected to all the car parks and visitors will be able to see which car park is more available
+
+181/2.wav	406	if the user does not show up in twenty minutes the reservation will automatically be cancelled
+181/3.wav	437	users are required to link a bank card or other mobile transaction agent
+
+Text(transcript) requirements:
+No capitalization, no numbers, no punctuation, only lowercase letters in the text.
+
+
+With the 181_testdata.csv and 181.zip, we can train the Deepspeech model, get a new model with Updated parameters
+
+
+
