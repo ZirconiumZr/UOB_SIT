@@ -1,0 +1,21 @@
+{% extends 'base_analysis.html' %}
+{% load static %}
+
+{% block head %}Report{% endblock %}
+{% block title %}<h1>Report</h1>{% endblock %}
+
+{% block content %}
+<h2> Audio:</h2>
+{% if audio %}
+    <ul>
+        <li>audio_id:   {{audio.audio_id}}</li>
+        <li>audio_name: {{audio.audio_name}}</li>
+        <li>path_orig:  {{audio.path_orig}}</li>
+    </ul>
+{% else %}
+    <p>No audios are available.</p>
+{% endif %}
+
+<h2> Report:</h2>
+<p>Add analysis report here....</p>
+{% endblock %}

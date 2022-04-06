@@ -1,0 +1,77 @@
+{% extends 'base_analysis.html' %}
+{% load static %}
+
+{% block head %}History{% endblock %}
+{% block title %}<h1>History</h1>{% endblock %}
+
+{% block content %}
+
+<b>Here is uploaded audios histroy</b>
+
+<div class="row justify-content-center">
+
+<div class="col-1"></div>
+<div class="col-10"> 
+    <div class="panel panel-default">  
+        <div class="panel-body">  
+        
+        <!-- ###### TODO: Add Filters / Search Function ###### -->
+
+        {% if audioList %}
+        <!--
+            <ul>
+            {% for audio in audioList %}
+                <li><a href="{% url 'analysis:report' audio.audio_id %}">{{ audio.audio_name }}</a> ==> <a href="{% url 'analysis:analysis_selection' audio.audio_id %}">AnalysisStart</a> | <a>Report</a> | <a>Delete</a></li>
+            {% endfor %}
+            </ul>
+            <br><br><br>
+        -->
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                            </div>
+                        </th>
+                        <th scope="col">Original Audio Name</th>
+                        <th scope="col">Upload File Name</th>
+                        <th scope="col">No. of Files</th>
+                        <th scope="col">Create By</th>
+                        <th scope="col">Create On</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audio in audioList %}
+                    <tr>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                            </div>
+                        </td>
+                        <td><a href="{% url 'analysis:report' audio.audio_id %}">{{ audio.audio_name }}</a></td>  <!-- ###### TODO: change to Audio Master Data Page ###### -->
+                        <td>{{ audio.upload_filename}}</td>
+                        <td>{{ audio.upload_file_count}}</td>
+                        <td>{{ audio.create_by}}</td>
+                        <td>{{ audio.create_date}} {{audio.create_time}}</td>
+                        <td></td>
+                        <td></td>
+                        <td><a href="{% url 'analysis:analysis_selection' audio.audio_id %}">AnalysisStart</a> | <a href="{% url 'analysis:report' audio.audio_id %}">Report</a> | <a>Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No audios are available.</p>
+        {% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-1"></div>
+
+</div>
+
+{% endblock %}

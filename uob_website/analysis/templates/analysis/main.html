@@ -1,0 +1,73 @@
+{% extends 'base_analysis.html' %}
+{% load static %}
+
+{% block head %}Main{% endblock %}
+{% block title %}<h1>Main</h1>{% endblock %}
+
+{% block band %}
+{% if user.is_authenticated %}
+    {% comment %} <p> <a>{{ user.username }}</a> | <a href="{% url 'logout' %}">Log Out</a></p> {% endcomment %}
+    <div class="hstack gap-3">
+        {% comment %} <div class="bg-light border">First item</div> {% endcomment %}
+        <div class="ms-auto">{{ user.username }}</div>
+        <div class="vr"></div>
+        <div class="bg-light border"><a href="{% url 'logout' %}">Log Out</a></div>
+    </div>
+{% endif %}
+{% endblock %}
+
+
+{% block navigation %}
+{% if user.is_authenticated %}
+{% comment %} <p><a href="{% url 'analysis:main' %}"> Main </a> | <a href="{% url 'analysis:history' %}"> History </a> | <a href="{% url 'analysis:upload' %}"> Upload </a> | <a href="{% url 'analysis:about' %}"> About </a></p> {% endcomment %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">UOB Group</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'analysis:main' %}">Main</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'analysis:history' %}">History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'analysis:upload' %}">Upload</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'analysis:about' %}">About</a>
+          </li>
+        </ul>
+        <form class="d-flex">  <!-- ###### TODO: Search in the page ###### -->
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+</nav>
+
+
+{% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+{% if user.is_authenticated %}
+<div>
+    <p> Hello {{ user.username }}! </p>
+    <p> Welcome to Voice to Text Analysis System</p>
+    <p> number of audios: <b> {{num_audios}} </b> </p>
+</div>   
+
+{% else %}
+    <p>You are not logged in</p>
+    <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+
+{% endblock %}
+
