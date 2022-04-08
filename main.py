@@ -23,7 +23,7 @@ from pyannote.audio import Pipeline as pa_Pipeline
 from pydub import AudioSegment
 
 
-import uob_audiosegmentation, uob_noisereduce, uob_speechenhancement, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils, uob_label
+import uob_audiosegmentation, uob_noisereduce, uob_speechenhancement, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils, uob_label,uob_superresolution
 from init import (
     pretrained_model_path,
     AUDIO_NAME,
@@ -33,6 +33,7 @@ from init import (
     STT_SAMPLERATE,
     FLG_REDUCE_NOISE,
     FLG_SPEECH_ENHANCE,
+    FLG_SUPER_RES,
     sd_global_starttime,
     sttModel
 )
@@ -98,6 +99,8 @@ nr_model = uob_noisereduce.load_noisereduce_model_local(quantized=False)
 ## Speech Reduce models
 # se_model = uob_speechenhancement.load_speechenhancement_model(model='unet',quantized=True)
 se_model = uob_speechenhancement.load_speechenhancement_model_local(quantized=False)
+## Super Resolution models
+sr_model = uob_superresolution.load_superresolution_model(quantized=False)
 ## Load malaya vad model
 # vad_model_vggvox2 = uob_speakerdiarization.load_vad_model(quantized=False)
 vad_model_vggvox2 = uob_speakerdiarization.load_vad_model_local(quantized=False)
@@ -149,12 +152,14 @@ if chunksfolder != '':
                                                 audiofile=file,
                                                 nr_model=nr_model,   # ?: [nr_model, nr_quantized_model]
                                                 se_model=se_model,
+                                                sr_model=sr_model,
                                                 vad_model=vad_model_vggvox2,
                                                 sv_model=sv_model_speakernet,    # ?: sv_model_speakernet, sv_model_vggvox2
                                                 pipeline=pa_pipeline,
                                                 chunks=True, #fixed
                                                 reducenoise=FLG_REDUCE_NOISE,
                                                 speechenhance=FLG_SPEECH_ENHANCE,
+                                                superresolution=FLG_SUPER_RES,
                                                 sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
             
             
@@ -194,12 +199,14 @@ else:
                                         audiofile=AUDIO_FILE,
                                         nr_model=nr_model,   # ?: [nr_model, nr_quantized_model]
                                         se_model=se_model,
+                                        sr_model=sr_model,
                                         vad_model=vad_model_vggvox2,
                                         sv_model=sv_model_speakernet,    # ?: sv_model_speakernet, sv_model_vggvox2
                                         pipeline=pa_pipeline,
                                         chunks=False, #fixed
                                         reducenoise=FLG_REDUCE_NOISE, 
                                         speechenhance=FLG_SPEECH_ENHANCE,
+                                        superresolution=FLG_SUPER_RES,
                                         sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
     
     # ### * Cut audio by SD result

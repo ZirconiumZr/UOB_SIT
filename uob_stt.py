@@ -4,6 +4,7 @@ import wave
 import json
 import subprocess
 import uob_extractmodel
+import librosa
 from init import (
     SAMPLE_RATE,
     pretrained_model_path,
@@ -18,6 +19,9 @@ def load_stt_model(stt_model = sttModel, pretrained_model_path=pretrained_model_
     elif stt_model=='malaya-speech': 
         model = uob_extractmodel.get_model_stt_malaya_speech()
         return model
+    # elif stt_model=='deepspeech':
+    #     model = uob_extractmodel.get_model_stt_deepspeech()
+    #     return model
 
 
 def stt_conversion_vosk(slices_path, rec, sr = STT_SAMPLERATE):
@@ -75,7 +79,8 @@ def stt_conversion_malaya_speech(slices_path, rec):
             namef_other, namef_index = namef.rsplit("_", 1)
             namef_index = int(namef_index)
             inputFile = slices_path+"/"+filename
-            singlish, sr = malaya_speech.load(inputFile)
+            # singlish, sr = malaya_speech.load(inputFile)
+            singlish, sr = librosa.load(inputFile,sr= None, mono= True)
             # greedy_decoder
             transcription = rec.greedy_decoder([singlish])
             # beam_decoder

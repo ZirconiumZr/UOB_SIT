@@ -211,8 +211,71 @@ def get_model_speechenhancement(pretrained_model_path = pretrained_model_path, m
     
     return model_object
     
-
-
+def get_model_superresolution(pretrained_model_path = pretrained_model_path, model='srgan-256', quantized:bool=False, **kwargs):
+    _availability = {
+    'srgan-128': {
+        'Size (MB)': 7.37,
+        'Quantized Size (MB)': 2.04,
+        'SDR': 17.03345,
+        'ISR': 22.33026,
+        'SAR': 17.454372,
+    },
+    'srgan-256': {
+        'Size (MB)': 29.5,
+        'Quantized Size (MB)': 7.55,
+        'SDR': 16.34558,
+        'ISR': 22.067493,
+        'SAR': 17.02439,
+    },
+    }
+    model = model.lower()
+    if model not in _availability:
+        raise ValueError(
+            'model not supported, please check supported models from `malaya_speech.super_resolution.available_model()`.'
+        )
+    # return unet.load_1d(
+    #     model=model,
+    #     module='super-resolution',
+    #     quantized=quantized,
+    #     **kwargs
+    # )
+        ## Declare model file
+    module = 'super-resolution'
+    path = pretrained_model_path
+    if quantized:
+        path = os.path.join(module, f'{model}-quantized')
+        quantized_path = os.path.join(path, 'model.pb')
+        modelfile = os.path.join(pretrained_model_path, quantized_path).replace('\\', '/')
+        # print('true')
+    else:
+        path = os.path.join(module, model, 'model.pb')
+        modelfile = os.path.join(pretrained_model_path, path).replace('\\', '/')
+        # print('false')
+    
+    # print(modelfile)
+    ## Check if model.pb exists
+    path_dict = check_file(
+                            model=model,
+                            base_path=pretrained_model_path,
+                            module=module,
+                            keys={'model': 'model.pb'},
+                            validate=True,
+                            quantized=quantized,
+                            **kwargs,
+                            )
+    print(path_dict)
+    
+    model_object = load_1d(
+        modelfile=modelfile,
+        model=model,
+        module=module,
+        quantized=quantized,
+        **kwargs
+    )
+    
+    return model_object
+    # model = malaya_speech.super_resolution.deep_model(model = 'srgan-256')
+    
 def get_model_vad(pretrained_model_path = pretrained_model_path, model = 'vggvox-v2', quantized:bool=False, **kwargs):
     '''
     available models:
@@ -633,6 +696,9 @@ _transducer_availability = {
         'Language': ['singlish'],
     },
 }
+
+# def get_model_stt_deepspeech():
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                        Utils                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

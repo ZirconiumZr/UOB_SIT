@@ -26,16 +26,16 @@ import numpy as np
 from datetime import datetime
 import subprocess as sub
 
-import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage
+import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage, uob_superresolution
 
-def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, sd_proc='pyannoteaudio'):
+def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution=False, sd_proc='pyannoteaudio'):
     ## Reduce noise
     if reducenoise == True:
         ## load nr models
         # nr_model, nr_quantized_model = uob_noisereduce.load_noisereduce_model(modelname='resnet-unet')
         # start to process
         y = malaya_reduce_noise(y, sr, nr_model=nr_model)
-        y = volIncrease(audioname,audiopath)
+        # y = volIncrease(audioname,audiopath)
         
         if chunks:
             namef, namec = os.path.splitext(audioname)
@@ -67,7 +67,23 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
             namec = namec[1:]
             audioname = '%s.%s'%(namef+'_se',namec)
             sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+
+    ## Super Resolution
+    if superresolution == True:
+        y = malaya_super_resolution(y=y, sr=sr, sr_model=sr_model)
         
+        if chunks:
+            namef, namec = os.path.splitext(audioname)
+            namef_other, namef_index = namef.rsplit("_", 1)
+            namef_index = int(namef_index)
+            namec = namec[1:]
+            audioname = '%s_%04d.%s'%(namef_other+'_se',namef_index,namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+        else:
+            namef, namec = os.path.splitext(audioname)
+            namec = namec[1:]
+            audioname = '%s.%s'%(namef+'_se',namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?        
     
     ## Speaker Diarization
     if sd_proc == 'malaya':
@@ -134,7 +150,12 @@ def malaya_speech_enhance(y, sr, se_model):
     speechenhanced_audio =uob_speechenhancement.get_se_output(y, sr, se_model)
     y = speechenhanced_audio
     return y
-    
+
+def malaya_super_resolution(y, sr, sr_model):
+    ### * Enhance the Speech
+    superresolution_audio =uob_superresolution.get_sr_output(y, sr, sr_model)
+    y = superresolution_audio
+    return y    
     
 def malaya_sd(y, sr, audioname, audiopath, vad_model, sv_model):  
     '''
