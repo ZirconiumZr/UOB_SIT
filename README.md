@@ -14,7 +14,15 @@ E.g.
 
 python client.py --model deepspeech-0.9.3-models.pbmm --scorer deepspeech-0.9.3-models.scorer --audio bank.wav
 
-### For test data:
+### model
+
+scorer: https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer
+
+pre-train: https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm
+
+finetune_v1: dsft_model_v1.pbmm train_dataset:singlish
+
+### For train data:
 
 #### Need one csv with 3 column: (example: testdata.csv)
 
