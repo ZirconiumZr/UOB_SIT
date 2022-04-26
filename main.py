@@ -34,6 +34,7 @@ from init import (
     FLG_REDUCE_NOISE,
     FLG_SPEECH_ENHANCE,
     FLG_SUPER_RES,
+    FLG_SUPER_ENHANCE_NEW,
     sd_global_starttime,
     sttModel
 )
@@ -160,6 +161,7 @@ if chunksfolder != '':
                                                 reducenoise=FLG_REDUCE_NOISE,
                                                 speechenhance=FLG_SPEECH_ENHANCE,
                                                 superresolution=FLG_SUPER_RES,
+                                                speechenhance_new=FLG_SUPER_ENHANCE_NEW,
                                                 sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
             
             
@@ -207,6 +209,7 @@ else:
                                         reducenoise=FLG_REDUCE_NOISE, 
                                         speechenhance=FLG_SPEECH_ENHANCE,
                                         superresolution=FLG_SUPER_RES,
+                                        speechenhance_new=FLG_SUPER_ENHANCE_NEW,
                                         sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
     
     # ### * Cut audio by SD result

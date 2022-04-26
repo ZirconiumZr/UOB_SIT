@@ -3,14 +3,15 @@ import os
 
 pretrained_model_path = './pretrained-model/'
 
-AUDIO_NAME = 'Bdb001_interaction_first60s.wav' #'Bdb001_interaction_first60s.wav'
+AUDIO_NAME = 'MOCK CALL_Bank Customer Service_139-284.wav' #'Bdb001_interaction_first60s.wav'
 AUDIO_PATH = './wav/'
 AUDIO_FILE = os.path.join(AUDIO_PATH,AUDIO_NAME)
 SAMPLE_RATE = 44100
 STT_SAMPLERATE = 16000
-FLG_REDUCE_NOISE:bool = False
-FLG_SPEECH_ENHANCE:bool = False
-FLG_SUPER_RES:bool = True
+FLG_REDUCE_NOISE:bool = True
+FLG_SPEECH_ENHANCE:bool = True
+FLG_SUPER_ENHANCE_NEW:bool = False
+FLG_SUPER_RES:bool = False
 
 label_stop_words = 'nan'
 label_checklist = 'checklist.txt'

@@ -26,9 +26,9 @@ import numpy as np
 from datetime import datetime
 import subprocess as sub
 
-import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage, uob_superresolution
+import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage, uob_superresolution, uob_speechenhancement_new
 
-def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution=False, sd_proc='pyannoteaudio'):
+def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution=False, speechenhance_new:bool=False, sd_proc='pyannoteaudio'):
     ## Reduce noise
     if reducenoise == True:
         ## load nr models
@@ -68,9 +68,9 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
             audioname = '%s.%s'%(namef+'_se',namec)
             sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
 
-    ## Super Resolution
-    if superresolution == True:
-        y = malaya_super_resolution(y=y, sr=sr, sr_model=sr_model)
+    ## Speech Enhancement
+    if speechenhance_new == True:
+        y = malaya_speech_enhance_new(y, sr)
         
         if chunks:
             namef, namec = os.path.splitext(audioname)
@@ -83,6 +83,22 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
             namef, namec = os.path.splitext(audioname)
             namec = namec[1:]
             audioname = '%s.%s'%(namef+'_se',namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+    ## Super Resolution
+    if superresolution == True:
+        y = malaya_super_resolution(y=y, sr=sr, sr_model=sr_model)
+        
+        if chunks:
+            namef, namec = os.path.splitext(audioname)
+            namef_other, namef_index = namef.rsplit("_", 1)
+            namef_index = int(namef_index)
+            namec = namec[1:]
+            audioname = '%s_%04d.%s'%(namef_other+'_sr',namef_index,namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+        else:
+            namef, namec = os.path.splitext(audioname)
+            namec = namec[1:]
+            audioname = '%s.%s'%(namef+'_sr',namec)
             sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?        
     
     ## Speaker Diarization
@@ -148,6 +164,12 @@ def malaya_reduce_noise(y, sr, nr_model):
 def malaya_speech_enhance(y, sr, se_model):
     ### * Enhance the Speech
     speechenhanced_audio =uob_speechenhancement.get_se_output(y, sr, se_model)
+    y = speechenhanced_audio
+    return y
+
+def malaya_speech_enhance_new(y, sr):
+    ### * Enhance the Speech
+    speechenhanced_audio =uob_speechenhancement_new.get_se_output(y, sr)
     y = speechenhanced_audio
     return y
 
