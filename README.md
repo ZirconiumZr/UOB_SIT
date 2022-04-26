@@ -1,6 +1,6 @@
 # Fine-tune STT model
 
-## 1.deepspeech
+## 1. deepspeech
 
 SoX is used to adjust the audio format and will not be used in the process of training the model, so it is not necessary to install it at present.
 
@@ -10,7 +10,7 @@ Not yet merged into main
 
 run in cmd：
 
-E.
+E.g.
 
 python client.py --model deepspeech-0.9.3-models.pbmm --scorer deepspeech-0.9.3-models.scorer --audio bank.wav
 
