@@ -4,6 +4,16 @@
 
 SoX is used to adjust the audio format and will not be used in the process of training the model, so it is not necessary to install it at present.
 
+### run STT
+
+Not yet merged into main
+
+run in cmd：
+
+E.
+
+python client.py --model deepspeech-0.9.3-models.pbmm --scorer deepspeech-0.9.3-models.scorer --audio bank.wav
+
 ### For test data:
 
 #### Need one csv with 3 column: (example: testdata.csv)
