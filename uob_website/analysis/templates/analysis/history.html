@@ -6,12 +6,30 @@
 
 {% block content %}
 
-<b>Here is uploaded audios histroy</b>
+{% comment %} <b>Here is uploaded audios histroy</b> {% endcomment %}
 
 <div class="row justify-content-center">
 
-<div class="col-1"></div>
-<div class="col-10"> 
+<!-- TODO:  filter different data list -->
+{% comment %} 
+<div class="d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <button class="nav-link active" id="v-pills-all-tab" data-bs-toggle="pill" data-bs-target="#v-pills-all" type="button" role="tab" aria-controls="v-pills-all" aria-selected="true">All</button>
+        <button class="nav-link" id="v-pills-pending-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pending" type="button" role="tab" aria-controls="v-pills-pending" aria-selected="false">Pending Analysis</button>
+        <button class="nav-link" id="v-pills-start-tab" data-bs-toggle="pill" data-bs-target="#v-pills-start" type="button" role="tab" aria-controls="v-pills-start" aria-selected="false">Analysis Started</button>
+        <button class="nav-link" id="v-pills-complete-tab" data-bs-toggle="pill" data-bs-target="#v-pills-complete" type="button" role="tab" aria-controls="v-pills-complete" aria-selected="false">Analysis Completed</button>
+    </div>
+    <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-all-tab">...</div>
+        <div class="tab-pane fade" id="v-pills-pending" role="tabpanel" aria-labelledby="v-pills-pending-tab">...</div>
+        <div class="tab-pane fade" id="v-pills-start" role="tabpanel" aria-labelledby="v-pills-start-tab">...</div>
+        <div class="tab-pane fade" id="v-pills-complete" role="tabpanel" aria-labelledby="v-pills-complete-tab">...</div>
+    </div>
+</div>
+{% endcomment %}
+
+{% comment %} <div class="col-1"></div> {% endcomment %}
+<div class="col-11"> 
     <div class="panel panel-default">  
         <div class="panel-body">  
         
@@ -26,52 +44,125 @@
             </ul>
             <br><br><br>
         -->
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-                            </div>
-                        </th>
-                        <th scope="col">Original Audio Name</th>
-                        <th scope="col">Upload File Name</th>
-                        <th scope="col">No. of Files</th>
-                        <th scope="col">Create By</th>
-                        <th scope="col">Create On</th>
-                        <th scope="col">Size</th>
-                        <th scope="col">Duration</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for audio in audioList %}
-                    <tr>
-                        <td>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-                            </div>
-                        </td>
-                        <td><a href="{% url 'analysis:report' audio.audio_id %}">{{ audio.audio_name }}</a></td>  <!-- ###### TODO: change to Audio Master Data Page ###### -->
-                        <td>{{ audio.upload_filename}}</td>
-                        <td>{{ audio.upload_file_count}}</td>
-                        <td>{{ audio.create_by}}</td>
-                        <td>{{ audio.create_date}} {{audio.create_time}}</td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{% url 'analysis:analysis_selection' audio.audio_id %}">AnalysisStart</a> | <a href="{% url 'analysis:report' audio.audio_id %}">Report</a> | <a>Delete</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <form method="post" enctype="multipart/form-data" id="id_form_history" name="form_history">
+                {% csrf_token %}
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" name="cb_history_hd">
+                                </div>
+                            </th>
+                            <th scope="col">Original Audio Name</th>
+                            <th scope="col">Upload File Name</th>
+                            <th scope="col">No. of Files</th>
+                            <th scope="col">Create By</th>
+                            <th scope="col">Create On</th>
+                            {% comment %} <th scope="col">Size</th> {% endcomment %}
+                            {% comment %} <th scope="col">Duration</th> {% endcomment %}
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audio in audioList %}
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"  name="cb_history_hd">
+                                </div>
+                            </td>
+                            <td>
+                                {% comment %} <a href="{% url 'analysis:report' audio.audio_id %}" data-toggle="popover" data-trigger="hover" title="Popover Header" data-placement="bottom"> {% endcomment %}
+                                <a href="{% url 'analysis:report' audio.audio_id %}">
+                                    {{ audio.audio_name }}
+                                </a>
+                                <br>{{audio.audio_id}}
+                            </td>  <!-- ###### TODO: change to Audio Master Data Page ###### -->
+                            <td>{{ audio.upload_filename}}</td>
+                            <td>{{ audio.upload_file_count}}</td>
+                            <td>{{ audio.create_by}}</td>
+                            <td>{{ audio.create_date}} {{audio.create_time}}</td>
+                            {% comment %} <td>##size##</td> {% endcomment %}
+                            {% comment %} <td>##duration##</td> {% endcomment %}
+                            <td>
+                                {% comment %} <a href="{% url 'analysis:analysis_selection' audio.audio_id %}">Start</a> |  {% endcomment %}
+                                {% comment %} <a href="{% url 'analysis:report' audio.audio_id %}">Report</a> |  {% endcomment %}
+                                {% comment %} <a href="{% url 'analysis:history' %}">Delete</a> {% endcomment %}
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#singleStart_{{forloop.counter}}">Start</button>
+                                <form method="post" enctype="multipart/form-data" id="HistorySingleStart" name="HistorySingleStart">
+                                    {% csrf_token %}
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="singleStart_{{forloop.counter}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="singleStartLabel">Analysis Selection</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% comment %} Analysis for {{audio.audio_id}}: {{audio.audio_name}}: {% endcomment %}
+                                                {{ analysisSelectionForm.analysisChoices.label}}
+                                                <div class="list-group">
+                                                  {% for selection in analysisSelectionForm.analysisChoices %}
+                                                    <label class="list-group-item">
+                                                        {{ selection.tag }}{{ selection.choice_label}}
+                                                    </label> 
+                                                  {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a href="{% url 'analysis:history' %}"><button type="submit" class="btn btn-primary" id="modal_singleStart" name="modal_singleStart" value={{audio.audio_id}} onclick="location.href='{% url 'analysis:history' %}'">Start</button></a>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <button type="button" class="btn btn-outline-success" onclick="location.href='{% url 'analysis:report' audio.audio_id %}'">Report</button>
+                                
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#singleDelete_{{forloop.counter}}">Delete</button>
+                                <form method="post" enctype="multipart/form-data" id="HistorySingleDelete" name="HistorySingleDelete">
+                                    {% csrf_token %}
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="singleDelete_{{forloop.counter}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="singleDeleteLabel">Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure to delete {{audio.audio_id}}: {{audio.audio_name}} ?
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary" id="modal_singleDelete" name="modal_singleDelete" value={{audio.audio_id}}>Delete</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            <form>
         {% else %}
             <p>No audios are available.</p>
         {% endif %}
         </div>
     </div>
 </div>
-<div class="col-1"></div>
+{% comment %} <div class="col-1"></div> {% endcomment %}
 
 </div>
 
 {% endblock %}
+
+
+<script>
+    
+</script>

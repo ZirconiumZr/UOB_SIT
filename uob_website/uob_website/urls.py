@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView,RedirectView
 from sympy import Permanent # new
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -27,3 +29,6 @@ urlpatterns = [
     # path('', TemplateView.as_view(template_name='login.html'), name='login'), # new
     path('', RedirectView.as_view(url='/accounts/login', permanent=True)) # new
 ]
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
