@@ -10,8 +10,7 @@ from init import (
     AUDIO_NAME
 )
 
-def get_se_output(y, sr):
-
+def load_speechenhancement_model_local():
     args = parser.parse_args()
 
     # mode = args.mode
@@ -20,6 +19,23 @@ def get_se_output(y, sr):
     weights_path = args.weights_folder
     #pre trained model
     name_model = args.name_model
+
+    # load json and create model
+    json_file = open(weights_path+'/'+name_model+'.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    # load weights into new model
+    loaded_model.load_weights(weights_path+'/'+name_model+'.h5')
+    print("Loaded SE model from disk")
+    return loaded_model
+
+
+def get_se_output(y, sr, se_model_new):
+    """ This function takes as input pretrained weights, noisy voice sound to denoise, predict
+    the denoise sound and save it to disk.
+    """
+    args = parser.parse_args()
     # Minimum duration of audio files to consider
     min_duration = args.min_duration
     #Frame length for training data
@@ -30,23 +46,6 @@ def get_se_output(y, sr):
     n_fft = args.n_fft
     #hop length for fft
     hop_length_fft = args.hop_length_fft
-
-    result = prediction(weights_path, name_model, y, sr, min_duration, frame_length, hop_length_frame, n_fft, hop_length_fft)
-    return result
-
-def prediction(weights_path, name_model, y, sr, min_duration, frame_length, hop_length_frame, n_fft, hop_length_fft):
-    """ This function takes as input pretrained weights, noisy voice sound to denoise, predict
-    the denoise sound and save it to disk.
-    """
-
-    # load json and create model
-    json_file = open(weights_path+'/'+name_model+'.json', 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    # load weights into new model
-    loaded_model.load_weights(weights_path+'/'+name_model+'.h5')
-    print("Loaded SE model from disk")
 
     # Extracting noise and voice from folder and convert to numpy
     audio = audio_files_to_numpy(y, sr,
@@ -65,7 +64,7 @@ def prediction(weights_path, name_model, y, sr, min_duration, frame_length, hop_
     #Reshape for prediction
     X_in = X_in.reshape(X_in.shape[0],X_in.shape[1],X_in.shape[2],1)
     #Prediction using loaded network
-    X_pred = loaded_model.predict(X_in)
+    X_pred = se_model_new.predict(X_in)
     #Rescale back the noise model
     inv_sca_X_pred = inv_scaled_ou(X_pred)
     #Remove noise model from noisy speech

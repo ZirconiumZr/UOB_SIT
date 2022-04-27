@@ -23,7 +23,7 @@ from pyannote.audio import Pipeline as pa_Pipeline
 from pydub import AudioSegment
 
 
-import uob_audiosegmentation, uob_noisereduce, uob_speechenhancement, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils, uob_label,uob_superresolution
+import uob_audiosegmentation, uob_noisereduce, uob_speechenhancement, uob_speakerdiarization, uob_stt, uob_mainprocess, uob_utils, uob_label,uob_superresolution, uob_speechenhancement_new
 from init import (
     pretrained_model_path,
     AUDIO_NAME,
@@ -100,6 +100,7 @@ nr_model = uob_noisereduce.load_noisereduce_model_local(quantized=False)
 ## Speech Reduce models
 # se_model = uob_speechenhancement.load_speechenhancement_model(model='unet',quantized=True)
 se_model = uob_speechenhancement.load_speechenhancement_model_local(quantized=False)
+se_model_new = uob_speechenhancement_new.load_speechenhancement_model_local()
 ## Super Resolution models
 sr_model = uob_superresolution.load_superresolution_model(quantized=False)
 ## Load malaya vad model
@@ -162,6 +163,7 @@ if chunksfolder != '':
                                                 speechenhance=FLG_SPEECH_ENHANCE,
                                                 superresolution=FLG_SUPER_RES,
                                                 speechenhance_new=FLG_SUPER_ENHANCE_NEW,
+                                                se_model_new = se_model_new,
                                                 sd_proc='resemblyzer')  # ?: [pyannoteaudio, malaya, resemblyzer]
             
             

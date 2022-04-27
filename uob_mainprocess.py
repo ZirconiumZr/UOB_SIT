@@ -28,7 +28,7 @@ import subprocess as sub
 
 import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage, uob_superresolution, uob_speechenhancement_new
 
-def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution=False, speechenhance_new:bool=False, sd_proc='pyannoteaudio'):
+def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution=False, speechenhance_new:bool=False, se_model_new=None, sd_proc='pyannoteaudio'):
     ## Reduce noise
     if reducenoise == True:
         ## load nr models
@@ -70,7 +70,7 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
 
     ## Speech Enhancement
     if speechenhance_new == True:
-        y = malaya_speech_enhance_new(y, sr)
+        y = malaya_speech_enhance_new(y, sr, se_model_new = se_model_new)
         
         if chunks:
             namef, namec = os.path.splitext(audioname)
@@ -167,9 +167,9 @@ def malaya_speech_enhance(y, sr, se_model):
     y = speechenhanced_audio
     return y
 
-def malaya_speech_enhance_new(y, sr):
+def malaya_speech_enhance_new(y, sr, se_model_new):
     ### * Enhance the Speech
-    speechenhanced_audio =uob_speechenhancement_new.get_se_output(y, sr)
+    speechenhanced_audio =uob_speechenhancement_new.get_se_output(y, sr, se_model_new)
     y = speechenhanced_audio
     return y
 
