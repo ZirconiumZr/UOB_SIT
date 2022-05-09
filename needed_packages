@@ -1,0 +1,3 @@
+transformers=4.19.0.dev0
+librosa=0.9.1
+torch=1.11.0
