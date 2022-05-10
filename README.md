@@ -12,7 +12,7 @@ Total time cost(run on colab with cpu):4638.542973041534 seconds
 
 Average time cost(run on colab with cpu): 1.29 seconds
 
-Detailed test results see the "orig_transformer_results.word"document
+Detailed test results see the "orig_transformer_results.csv"document
 
 
 
