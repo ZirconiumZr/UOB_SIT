@@ -19,3 +19,5 @@ Note: In the 'pos_before', 'pos_after' and 'replace' columns, if there is more t
 e.g. your bb;your obey;you will be
 
 e.g. ADP;VERB
+
+Note: The conditions in pos_before and pos_after are "or", not "and".
