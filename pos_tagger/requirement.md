@@ -6,9 +6,11 @@ can manually download 'averaged_perceptron_tagger'&'universal_tagset'
 
 Each line represents a rule for a word that needs to be replaced
 
+universal_tagset reference: https://universaldependencies.org/u/pos/all.html#al-u-pos/
+
 1. For column "key": Fill in the word we want, e.g. uob.
-2. For column "pos_before": The lexical form of a word preceding that word, e.g. ADP.
-3. For column "pos_after": The lexical form of a word that follows that word, e.g. VERB.
+2. For column "pos_before": The POS of a word preceding that word, e.g. ADP.
+3. For column "pos_after": The POS of a word that follows that word, e.g. VERB.
 4. For column "replace": STT may be identified as, e.g. your bb;you will be.
 5. For column "flag_direct_replace": If you want to directly replace some words without considering the part of speech, mark "x" here.
 
