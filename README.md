@@ -18,4 +18,10 @@ Detailed test results see the "orig_transformer_results.csv"document
 
 After fine-tune:
 
-(...)
+Test records of model"RuiqianLi/wav2vec2-large-xls-r-300m-singlish-colab"
+
+Use 3579 records of malaya-dataset(529 MB)  to do the test:
+
+The average accuracy:0.9682434609642978
+
+Detailed test results see the "after_singlish_finetune_results.csv"document
