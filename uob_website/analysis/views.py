@@ -1,9 +1,12 @@
+import csv
 from datetime import datetime
+import time
 import json
 import os
+from pickle import TRUE
 import threading
 
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.template import loader
 from django.urls import reverse
@@ -11,6 +14,8 @@ from django.views import View
 from django.views.generic.edit import DeleteView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
+from sympy import arg
+import analysis
 
 from uob_website.settings import MEDIA_ROOT
 
@@ -26,11 +31,22 @@ from .uob_init import (
 )
 
 # Create your views here.
-@login_required
+@login_required(login_url="/accounts/login/")
 def main(request):
-    num_audios=  Audio.objects.all().count()
-    return render(request, "analysis/main.html", {'num_audios':num_audios})
+    num_audios_all = Audio.objects.all().count()
+    if request.user.is_staff: #is_superuser:
+        num_audios= Audio.objects.filter(flg_delete=None).count()
+    else:
+        num_audios= Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin())).count()
+    num_audios_unanalysis = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()), analysis='{}').count() + Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()), analysis=None).count()
+    context = {'num_audios': num_audios,
+               'num_audios_all': num_audios_all,
+               'num_audios_unanalysis': num_audios_unanalysis
+               }
+    return render(request, "analysis/main.html", context=context)
     
+
+@login_required(login_url="/accounts/login/")
 def upload(request):
     # context={}
     # return render(request, template_name='analysis/upload.html', context=context)
@@ -118,85 +134,104 @@ def history(request):
             
         ### Single Analysis Start
         if request.POST.get('modal_singleStart'):
-            audio_to_analysis =  Audio.objects.get(pk=request.POST.get('modal_singleStart'))
+            audio_to_analysis = Audio.objects.get(pk=request.POST.get('modal_singleStart'))
             if audio_to_analysis != None:
                 # analysis_selection(request, audio_id=audio_to_analysis.audio_id)
-                print(audio_to_analysis.audio_meta)
                 analysisSelectionForm = AnalysisSelectionForm(request.POST)
                 if analysisSelectionForm.is_valid():
                     print('valid checked')
                     analysis_selected = analysisSelectionForm.cleaned_data.get('analysisChoices')
                     print('analysisChoices: ', analysis_selected)
                     choices = AnalysisSelection.objects.all()
-                    print(choices)
                     json_analysis_selection = {}
                     
                     ### * Start to Analyze
-                    
-                    starttime = datetime.now()
-                    for i in analysis_selected:
-                        i_int = int(i)-1
-                        json_analysis_selection[str(i_int)] = choices[i_int].analysis_name  #example: {"0":"SD", "1":"STT"}
-                        if choices[i_int].analysis_name == 'SD+STT':
-                            print('*'*30)
-                            print("SD+STT")
-                            sdstt = STTresult.objects.filter(audio_id = audio_to_analysis.audio_id)
-                            if not sdstt:
-                                # TODO: multi threading, to close Modal and run model at the same time
-                                t1 = AnalysisThread(func=uob_main.sd_and_stt, args=(audio_to_analysis, starttime, choices[i_int].analysis_name))
-                                t1.start()
-                                t1.join()
-                                result = t1.get_result()
-                                print("*****result*****:",result)
-                                # sdstt_df = uob_main.sd_and_stt(audio=audio_to_analysis, starttime=starttime, analysis_name=choices[i_int].analysis_name)
-                                # result = sdstt_df
-                            else:
-                                # raise ValueError("Audio "+audio_to_analysis.audio_id+" has been performed analysis of "+choices[i_int].analysis_name)
-                                print("Warning: "+"Audio "+audio_to_analysis.audio_id+" has been performed analysis of "+choices[i_int].analysis_name)
-                        if choices[i_int].analysis_name == 'use case 1':
-                            print('*'*30)
-                            print("use case 1")
-                        if choices[i_int].analysis_name == 'use case 3':
-                            print('*'*30)
-                            print("use case 3")
-                    endtime = datetime.now()
-
-                    print('*' * 30,'\n  Finished!!',)
-                    print('start from:', starttime) 
-                    print('end at:', endtime) 
-                    print('duration: ', endtime-starttime)
-                    
-                    
-                    ### * Save to Log Table
-                    params = json.dumps({"NR":FLG_REDUCE_NOISE, "SE":FLG_SPEECH_ENHANCE, "SR":FLG_SUPER_RES, "SD":sdModel, "STT":sttModel})
-                    analysis_name = json.dumps(json_analysis_selection)
-                    message = ''
-                    process_time = '{"starttime":"%s", "endtime":"%s", "duration":"%s"}'%(starttime,endtime,endtime-starttime)
-                    uob_storage.dbInsertLog(audio_id=audio_to_analysis.audio_id, params=params, analysis_name=analysis_name, process_time=process_time)
+                    threadLock = threading.Lock()
+                    threadLock.acquire()
+                    try:
+                        t = AnalysisThread(audio_to_analysis=audio_to_analysis,
+                                            analysis_selected=analysis_selected,
+                                            choices=choices,
+                                            json_analysis_selection=json_analysis_selection,
+                                            )
+                        # t = MyThread()
+                        t.setName('djAnalysisThread-main-'+audio_to_analysis.audio_id)
+                        t.start()
+                    finally:
+                        threadLock.release()
                         
                 else:
-                    print('analysis form not valid')
+                    print('analysis form is not valid')
         
+        ### Batch Delete (flag audio.flg_delete as "X")
+        if request.POST.get('modal_batchDelete'):
+            audioIdList = request.POST.get('modal_batchDelete') #string
+            audioIdList = audioIdList.split(",") #list
+            audios_to_delete = Audio.objects.filter(pk__in=audioIdList) #queryset
+            for audio in audios_to_delete:
+                if audio != None:
+                    audio.flg_delete = 'X'
+                    audio.save(update_fields=['flg_delete'])
+        
+        ### Batch Analysis Start
+        if request.POST.get('modal_batchStart'):
+            audioIdList = request.POST.get('modal_batchStart') #string
+            audioIdList = audioIdList.split(",") #list
+            audios_to_start = Audio.objects.filter(pk__in=audioIdList) #queryset
+            i = 0  # to name thread object
+            for audio_to_analysis in audios_to_start:
+                i += 1
+                if audio_to_analysis != None:
+                    # analysis_selection(request, audio_id=audio_to_analysis.audio_id)
+                    analysisSelectionForm = AnalysisSelectionForm(request.POST)
+                    if analysisSelectionForm.is_valid():
+                        print('analysis form valid checked')
+                        analysis_selected = analysisSelectionForm.cleaned_data.get('analysisChoices')
+                        print('analysisChoices: ', analysis_selected)
+                        choices = AnalysisSelection.objects.all()
+                        json_analysis_selection = {}
+                        
+                        ### * Start to Analyze
+                        threadLock = threading.Lock()
+                        threadLock.acquire()
+                        try:
+                            locals()['t{}'.format(i)] = AnalysisThread(audio_to_analysis=audio_to_analysis,
+                                                                        analysis_selected=analysis_selected,
+                                                                        choices=choices,
+                                                                        json_analysis_selection=json_analysis_selection,
+                                                                        )
+                            locals()['t{}'.format(i)].setName('djAnalysisThread-main-'+audio_to_analysis.audio_id)
+                            locals()['t{}'.format(i)].start()
+                        finally:
+                            threadLock.release()
+                            
+                    else:
+                        print('analysis form is not valid')
+                    
     else:
-        print("not post")
-
+        print("not post")   
     
     
-    # if audio_ids != None:
-    #     for audio_id in audio_ids:
-    #         audio = get_object_or_404(Audio, id=audio_id)
-    #         if audio != None:
-    #             audio.flg_delete = 'X'
-    #             audio.save(update_fields=['flg_delete'])
-    
-    audioList = Audio.objects.filter(flg_delete=None)
+    threadCount = threading.activeCount()
+    threadList = threading.enumerate()
+    threadNameList = [thread.getName() for thread in threadList]
+    flag_analysisThread_active = True if True in [ True for name in threadNameList if 'djAnalysisThread' in name ] else False
+    activeAnalysis_audioId_list = [name.split('-')[-1] for name in [name for name in threadNameList if 'djAnalysisThread' in name]]
+    audioList_unanalysis = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()), analysis='{}')
+    audioList = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()))
     audioList = audioList.order_by('-create_date','-create_time')
     analysisSelectionForm = AnalysisSelectionForm()
     context = {
         'audioList': audioList,
-        'analysisSelectionForm': analysisSelectionForm
+        'analysisSelectionForm': analysisSelectionForm,
+        'threadCount': threadCount,
+        'threadList': threadList,
+        'threadNameList': threadNameList,
+        'flag_analysisThread_active': flag_analysisThread_active,
+        'activeAnalysis_audioId_list': activeAnalysis_audioId_list,
+        'audioList_unanalysis': audioList_unanalysis
     }
-    # return HttpResponse(template.render(context, request))
+    print('flag_analysisThread_active:',flag_analysisThread_active)
     return render(request, template_name='analysis/history.html', context=context)
 
 
@@ -275,18 +310,113 @@ def analysis_selection(request, audio_id):
 
 
 
-class AnalysisThread(threading.Thread):
 
-    def __init__(self,func,args=()):
-        super(AnalysisThread,self).__init__()
-        self.func = func
+class MyThread(threading.Thread):
+    def __init__(self,target=None,args=()):
+        super(MyThread,self).__init__()
+        self.target = target
         self.args = args
+    def run(self):
+        for i in range(5):
+            print("i=",i)
+            time.sleep(5)
+
+
+class AnalysisThread(threading.Thread):
+    def __init__(self,audio_to_analysis,analysis_selected,choices,json_analysis_selection,target=None,args=()):
+        super(AnalysisThread,self).__init__()
+        self.target = target
+        self.args = args
+        self.audio_to_analysis = audio_to_analysis
+        self.analysis_selected = analysis_selected
+        self.choices = choices
+        self.json_analysis_selection = json_analysis_selection
 
     def run(self):
-        self.result = self.func(*self.args)
+        # self.result = self.target(*self.args)
+        starttime = datetime.now()
+        sdstt = STTresult.objects.filter(audio_id = self.audio_to_analysis.audio_id)
+        print(self.analysis_selected)
+        print(self.choices)
+        for i in self.analysis_selected:
+            i_int = int(i)-1
+            self.json_analysis_selection[str(i_int)] = self.choices[i_int].analysis_name  #example: {"0":"SD+STT", "1":"use case 1"}
+            if self.choices[i_int].analysis_name == 'SD+STT':
+                print('*'*30)
+                print("SD+STT starts")
+                # sdstt = STTresult.objects.filter(audio_id = self.audio_to_analysis.audio_id)
+                if not sdstt:
+                    try:
+                        uob_main.sd_and_stt(self.audio_to_analysis, starttime, self.choices[i_int].analysis_name)
+                    except Exception as e1:
+                        print('SD+STT fails out of Exception:', type(e1))
+                        print(e1) 
+                else:
+                    # raise ValueError("Audio "+audio_to_analysis.audio_id+" has been performed analysis of "+choices[i_int].analysis_name)
+                    print("Warning: "+"Audio "+self.audio_to_analysis.audio_id+" has been performed analysis of "+self.choices[i_int].analysis_name)
+                
+                print("SD+STT ends")
+                print('*'*30)
+                
+            if self.choices[i_int].analysis_name == 'use case 1':
+                print('*'*30)
+                print("use case 1 starts")
+                print("use case 1 ends")
+                print('*'*30)
+                
+            if self.choices[i_int].analysis_name == 'use case 3':
+                print('*'*30)
+                print("use case 3 starts")
+                print("use case 3 ends")
+                print('*'*30)
+                                    
+        
+        endtime = datetime.now()
 
-    def get_result(self):
+        print('*' * 30,'\n  Finished!!',)
+        print('start from:', starttime) 
+        print('end at:', endtime) 
+        print('duration: ', endtime-starttime)
+        
+        ### * Save to Log Table
+        params = json.dumps({"NR":FLG_REDUCE_NOISE, "SE":FLG_SPEECH_ENHANCE, "SR":FLG_SUPER_RES, "SD":sdModel, "STT":sttModel})
+        analysis_name = json.dumps(self.json_analysis_selection)
+        message = ''
+        process_time = '{"starttime":"%s", "endtime":"%s", "duration":"%s"}'%(starttime,endtime,endtime-starttime)
         try:
-            return self.result
-        except Exception:
-            return None
+            uob_storage.dbInsertLog(audio_id=self.audio_to_analysis.audio_id, params=params, analysis_name=analysis_name, process_time=process_time)
+        except Exception as e_log:
+            print('Save log fails out of Exception:', type(e_log))
+            print(e_log) 
+
+
+
+def stt_exportcsv(request, audio_id):
+    sttResult = STTresult.objects.filter(audio_id = audio_id)
+    sttResult = sttResult.order_by("slice_id")
+    opts = sttResult.model._meta
+    filename = 'STT_Result_'+audio_id+'.csv'
+    response = HttpResponse('text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%s'%(filename)
+    writer = csv.writer(response)
+    
+    ### Option1: Write all cols in database table
+    # ## Write data header
+    # field_names = [field.name for field in opts.fields]
+    # writer.writerow(field_names)
+    # ## Write data rows
+    # for obj in sttResult:
+    #     writer.writerow([getattr(obj, field) for field in field_names])
+    
+    ### Option2: Write partial cols in database table
+    ## Write data header
+    field_names = ['audio_id','slice_id','speaker_label','start_time','end_time','duration','text']
+    writer.writerow(field_names)
+    ## Write data rows
+    sttResult_tbl = sttResult.values_list('audio_id','slice_id','speaker_label','start_time','end_time','duration','text')
+    for slice in sttResult_tbl:
+        writer.writerow(slice)
+        
+    return response
+
+            

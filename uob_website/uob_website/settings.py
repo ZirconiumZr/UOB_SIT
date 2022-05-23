@@ -37,9 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'analysis.apps.AnalysisConfig',
-    # 'crispy_forms', #new: for formatting using Bootstrap
-    # 'django_bootstrap5', #new: for formatting using Bootstrap
+    'analysis.apps.AnalysisConfig', #startapp
 ]
 
 MIDDLEWARE = [
@@ -134,10 +132,11 @@ DEFAULT_CHARSET = 'utf-8'
 
 STATIC_URL = '/static/'
 # MEDIA_ROOT = os.path.join(BASE_DIR,"analysis/audio/")  # new
-MEDIA_ROOT = 'E:/EBAC/Internship/UOB/Projects/uob_web_SIT-copy/audio/'
+MEDIA_ROOT = 'D:/EBAC/Internship/UOB/Projects/uob_web_SIT-copy/audio/'
 MEDIA_URL='/audio/'  # new
 
 LOGIN_REDIRECT_URL = "main"  # new
 LOGOUT_REDIRECT_URL = "main"  # new
 
-# CRISPY_TEMPLATE_PACK = 'bootstrap4'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'   # session engine(default)
+SESSION_COOKIE_AGE = 600   # Session's cookie expire time (600s)

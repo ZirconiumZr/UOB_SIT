@@ -59,6 +59,11 @@ class STTresult(models.Model):
     
     def __str__(self):
         return self.slice_name
+    
+    def slice_path_last_folder(self):
+        folder_tree_list =  self.slice_path.split('/')
+        last_folder = folder_tree_list[-1]
+        return last_folder
 
 
 class User(models.Model):

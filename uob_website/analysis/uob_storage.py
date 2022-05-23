@@ -2,6 +2,7 @@ from datetime import date, datetime
 import os
 import time
 import pymysql.cursors
+from pymysql.converters import escape_string
 
 from uob_website.settings import DATABASES
 
@@ -126,10 +127,12 @@ def dbUpdateAudio_processedInfo(audio_id, **kwargs): #audioname_processed, path_
     with connection:
         with connection.cursor() as cursor:
             if kwargs.get('audioname_processed') and kwargs.get('path_processed'):
-                sql = "UPDATE TABLE `analysis_audio` SET audio_name_processed = %s , path_processed = %s, update_by=%s, update_date=%s, update_time=%s WHERE audio_id = %s;"
+                sql = "UPDATE `analysis_audio` SET audio_name_processed = %s , path_processed = %s, update_by=%s, update_date=%s, update_time=%s WHERE audio_id = %s;"
                 cursor.execute(sql,(kwargs.get('audioname_processed'), kwargs.get('path_processed'), str(os.getlogin()),time.strftime("%Y-%m-%d"),time.strftime("%H:%M:%S"),audio_id))
             if kwargs.get('analysis'):
-                sql = "UPDATE TABLE `analysis_audio` SET analysis = %s, update_by=%s, update_date=%s, update_time=%s WHERE audio_id = %s;"
+                analysis_str = escape_string(str(kwargs.get('analysis')))
+                # print(analysis_str)
+                sql = "UPDATE `analysis_audio` SET analysis = %s, update_by=%s, update_date=%s, update_time=%s WHERE audio_id = %s;"
                 cursor.execute(sql,(kwargs.get('analysis'), str(os.getlogin()),time.strftime("%Y-%m-%d"),time.strftime("%H:%M:%S"),audio_id))
 
         connection.commit()

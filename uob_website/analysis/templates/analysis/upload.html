@@ -24,7 +24,7 @@
                 <label class="form-label" for="document">Document</label>
                 {% comment %} <input type="file" name="document" class="form-control" >{{ uploadFile.document }}</input> {% endcomment %}
                 <div class="input-group">
-                    <input type="file"  name="document" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">{{ uploadFile.document }}</input>
+                    <input type="file"  name="document" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload"  placeholder="Choose the Document to upload" required>{{ uploadFile.document }}</input>
                     <button type="submit" class="btn btn-outline-primary" id="inputGroupFileAddon04">Upload</button>
                     <button type="button" class="btn btn-outline-secondary" onclick="location.href='{% url 'analysis:upload' %}'">Remove</button>
                 </div>

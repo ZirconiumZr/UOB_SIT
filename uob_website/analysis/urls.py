@@ -13,6 +13,8 @@ urlpatterns = [
     # path('history/<str:audio_id>/analysis_selection/', views.CreateView.as_view(), name='analysis_selection'),
     # ex: /analysis/report/AUDIO20220331_IDS_0001/
     path('report/<str:audio_id>/', views.report, name='report'),
+    # ex: /analysis/report/AUDIO20220331_IDS_0001/exportcsv/
+    path('report/<str:audio_id>/stt_exportcsv/', views.stt_exportcsv, name='stt_exportcsv'),
     # ex: /analysis/upload/
     path('upload/', views.upload, name='upload'),
     # ex: /analysis/about/

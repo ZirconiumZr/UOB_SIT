@@ -43,7 +43,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     #### * Initialize Variables
     num_audio_files = 1
     savetime = starttime.strftime("%Y%m%d_%H%M%S")
-    audio_file = os.path.join(audio.path_orig, audio.audio_name)
+    audio_file = os.path.join(audio.path_orig, audio.audio_name).replace("\\","/")
     
     #### * Segmentation
     chunksfolder = ''
@@ -64,9 +64,8 @@ def sd_and_stt(audio, starttime, analysis_name):
     if chunksfolder != '':
         for filename in os.listdir(chunksfolder+"/"):
             if filename.endswith(".wav"): 
-                print(os.path.join(chunksfolder, filename))
                 ### * Load chunk file
-                file = os.path.join(chunksfolder, filename)
+                file = os.path.join(chunksfolder, filename).replace("\\","/")
                 y, sr = librosa.load(file, sr=None, mono=True)  #-->mono: y = y/2
 
                         
@@ -145,7 +144,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     final_sd_result = pd.DataFrame(tem_sd_result, columns=['index','starttime','endtime','duration','speaker_label','chunk_filename','chunk_starttime','chunk_endtime'])
     ###  Cut audio into slices by SD result
     namef, namec = os.path.splitext(audio.audio_name)
-    slices_path = os.path.join(audiopath, namef + '_slices_' + savetime) 
+    slices_path = os.path.join(audiopath, namef + '_slices_' + savetime).replace("\\","/")
     try:
         if not os.path.exists(slices_path):
             os.mkdir(slices_path)
@@ -162,7 +161,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                 tem_sd_result_forSlices = final_sd_result[final_sd_result['chunk_filename']==filename]
                 tem_sd_result_forSlices['index'] = tem_sd_result_forSlices['index'].astype(str)
                 tem_sd_result_forSlices = tem_sd_result_forSlices[['index','chunk_starttime','chunk_endtime']].values.tolist()
-                uob_mainprocess.cut_audio_by_timestamps(start_end_list=tem_sd_result_forSlices, audioname=filename, audiofile=os.path.join(chunksfolder+"_processed/",filename), part_path=slices_path)
+                uob_mainprocess.cut_audio_by_timestamps(start_end_list=tem_sd_result_forSlices, audioname=filename, audiofile=os.path.join(chunksfolder+"_processed/",filename).replace("\\","/"), part_path=slices_path)
         else:
             for filename in os.listdir(chunksfolder+"/"):
                 if re.match('^(%s_)(\d{4})'%(namef), filename):
@@ -170,7 +169,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                     tem_sd_result_forSlices['index'] = tem_sd_result_forSlices['index'].astype(str)
                     tem_sd_result_forSlices = tem_sd_result_forSlices[['index','chunk_starttime','chunk_endtime']].values.tolist()
                     print(tem_sd_result_forSlices)
-                    uob_mainprocess.cut_audio_by_timestamps(start_end_list=tem_sd_result_forSlices, audioname=filename, audiofile=os.path.join(chunksfolder,filename), part_path=slices_path)
+                    uob_mainprocess.cut_audio_by_timestamps(start_end_list=tem_sd_result_forSlices, audioname=filename, audiofile=os.path.join(chunksfolder,filename).replace("\\","/"), part_path=slices_path)
 
             
     else:
@@ -201,7 +200,7 @@ def sd_and_stt(audio, starttime, analysis_name):
         if flg_slice_orig == True:
             file_forSlices = audio_file
         else:
-            file_forSlices = os.path.join(audiopath, filename_forSlices)
+            file_forSlices = os.path.join(audiopath, filename_forSlices).replace("\\","/")
         uob_mainprocess.cut_audio_by_timestamps(start_end_list=tem_sd_result, audioname=filename_forSlices, audiofile=file_forSlices, part_path=slices_path)
 
     print('Cut Slices Done')
@@ -228,7 +227,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     print('*'*30)
     print("Speaker Labelling Start")
     
-    final = uob_mainprocess.speaker_label_func(transactionDf,pretrained_model_path=os.path.join(pretrained_model_path,'label/label_wordvector_model'),checklist_path=os.path.join(pretrained_model_path,'label/'))
+    final = uob_mainprocess.speaker_label_func(transactionDf,pretrained_model_path=os.path.join(pretrained_model_path,'label/label_wordvector_model').replace("\\","/"),checklist_path=os.path.join(pretrained_model_path,'label/').replace("\\","/"))
     
     print("Speaker Labelling Done")
     print('*'*30)
@@ -254,9 +253,14 @@ def sd_and_stt(audio, starttime, analysis_name):
         audio_name_processed = null
         path_processed = null
     analysis = json.loads(audio.analysis)
-    analysis_key = int(max(analysis.keys()))+1 if analysis!={} else 0
-    analysis[analysis_key] = analysis_name
+    print('json object analysis:', analysis)
+    if analysis_name not in analysis.values():
+        analysis_key = int(max(analysis.keys()))+1 if analysis!={} else 0
+        analysis[analysis_key] = analysis_name
+    else:
+        print(analysis_name, 'has been done before')
     analysis = json.dumps(analysis)
+    print('json string analysis:', analysis)
     uob_storage.dbUpdateAudio_processedInfo(audio_id = audio.audio_id, 
                                             audio_name_processed = audio_name_processed, 
                                             path_processed = path_processed,
@@ -271,8 +275,8 @@ def sd_and_stt(audio, starttime, analysis_name):
     sd_global_starttime = 0.0
     
     #### * End of SD+STT
-    print("SD+STT Done!!!")
-    print('*'*30)
+    # print("SD+STT Done!!!")
+    # print('*'*30)
     
     return final
 

@@ -26,10 +26,10 @@
                         {{audio.audio_file}}
                         <audio controls>
                             {% if audio.audio_name == audio.upload_filename %}
-                                <source src="{{MEDIA_URL}}/{{audio.audio_name}}" type="audio/wav">
+                                <source src="{{MEDIA_URL}}{{audio.audio_name}}" type="audio/wav">
                                 Your browser does not support the audio tag.
                             {% else %}
-                                <source src="{{MEDIA_URL}}/{{zip_folder}}/{{audio.audio_name}}" type="audio/wav">
+                                <source src="{{MEDIA_URL}}{{zip_folder}}/{{audio.audio_name}}" type="audio/wav">
                                 Your browser does not support the audio tag.
                             {% endif %}
                         </audio>
@@ -53,15 +53,79 @@
     <p>No audios are available.</p>
 {% endif %}
 
-<h2> Report:</h2>
-<p>Add analysis report here....</p>
+
 {% if sttResult %}
-<ul>
-    {% for record in sttResult%}
-        <li>{{record}}</li>
-    {% endfor %}
-</ul>
+    <div class="row g-2">
+        <div class="col-sm-10">
+            <h2> Report:</h2>
+        </div>
+        <div class="col-sm right">
+            <a href="{% url 'analysis:stt_exportcsv' audio.audio_id %}"><button type="button" class="btn btn-primary" id='btn_download_stt'>Download to CSV</button></a>
+        </div>
+    </div>
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Audio</th>
+                <th scope="col">SliceID</th>
+                <th scope="col">SpeakerLabel</th>
+                <th scope="col">Start</th>
+                <th scope="col">End</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Text</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slice in sttResult %}           
+            <tr>
+                <td>
+                    {% with slice.slice_path_last_folder as slice_folder %}
+                    <audio controls>
+                        {% if audio.audio_name == audio.upload_filename %}
+                            <source src="{{MEDIA_URL}}{{slice_folder}}/{{slice.slice_name}}" type="audio/wav">
+                            Your browser does not support the audio tag.
+                        {% else %}
+                            <source src="{{MEDIA_URL}}{{zip_folder}}/{{slice_folder}}/{{slice.slice_name}}" type="audio/wav">
+                            Your browser does not support the audio tag.
+                        {% endif %}
+                    </audio>
+                    {% endwith %}
+                </td>
+                <td>{{ slice.slice_id }}</td>
+                <td>{{ slice.speaker_label }}</td>
+                <td>{{ slice.start_time }}</td>
+                <td>{{ slice.end_time }}</td>
+                <td>{{ slice.duration }}</td>
+                <td>{{ slice.text }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h2> Report:</h2>
+    <p>Pending analysis report...</p>
 {% endif %}
+
+<div id="id_scrollBtns" style="position:fixed; right:0; bottom:0"> 
+    <button type="button" class="btn btn-secondary" onclick="scrollToTop()"><i class="bi bi-caret-up-fill"></i></button>
+    <br>
+    <button type="button" class="btn btn-secondary" onclick="scrollToBottom()"><i class="bi bi-caret-down-fill"></i></button>
+</div>
+
+
+
+
+
+<script language="javascript" type="text/javascript">
+    // ***** Scroll to top/bottom of page ***** //
+    function scrollToBottom() {
+        $(document).scrollTop($(document).height());
+    };
+    function scrollToTop() {
+        $(document).scrollTop(0);
+    };
+</script>
+
 {% endblock %}
 
 
