@@ -1,6 +1,5 @@
 from datetime import date
 import os
-from sunau import AUDIO_FILE_ENCODING_ADPCM_G721
 import time
 from django.db import models
 
@@ -66,13 +65,6 @@ class STTresult(models.Model):
         return last_folder
 
 
-class User(models.Model):
-    user_id = models.CharField(primary_key=True, max_length=30)
-    user_name = models.CharField(max_length=50,null=False,unique=True)
-    password = models.CharField(max_length=50,null=False,default='123456')
-    
-    def __str__(self):
-        return self.user_name
     
 
 class AnalysisSelection(models.Model):

@@ -3,7 +3,6 @@ from datetime import datetime
 import time
 import json
 import os
-from pickle import TRUE
 import threading
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
@@ -14,7 +13,6 @@ from django.views import View
 from django.views.generic.edit import DeleteView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
-from sympy import arg
 import analysis
 
 from uob_website.settings import MEDIA_ROOT

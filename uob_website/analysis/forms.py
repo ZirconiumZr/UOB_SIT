@@ -1,10 +1,9 @@
-from email.policy import default
 from django import forms
 from django.forms import widgets
 from matplotlib.pyplot import cla
 
 
-from .models import User, AnalysisSelection, Upload
+from .models import AnalysisSelection, Upload
 
 class LoginForm(forms.Form):
     user_name = forms.CharField(max_length=20)
