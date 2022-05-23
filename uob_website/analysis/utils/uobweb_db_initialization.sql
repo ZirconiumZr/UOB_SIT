@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `analysis_version` (
   `version_value` varchar(30) NOT NULL,
   PRIMARY KEY (`version_id`),
   UNIQUE KEY `version_name` (`version_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
 
 
 CREATE TABLE IF NOT EXISTS `analysis_process_log` (
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `analysis_analysisselection` (
   `analysisSelection_id` int NOT NULL AUTO_INCREMENT,
   `analysis_name` varchar(50) COLLATE utf8mb4_bin NOT NULL DEFAULT 'error',
   PRIMARY KEY (`analysisSelection_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 
 
