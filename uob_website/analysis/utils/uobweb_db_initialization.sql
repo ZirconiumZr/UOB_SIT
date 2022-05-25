@@ -89,6 +89,9 @@ BEGIN
 
     INSERT INTO `analysis_version` (`VERSION_NAME`,`VERSION_VALUE`)
     VALUES ('AUDIO_ID_VER',1);
+    INSERT INTO `analysis_version` (`VERSION_NAME`,`VERSION_VALUE`)
+    VALUES ('UPLOAD_ID_VER',1);
+
 
     SELECT * FROM analysis_version;
 END;

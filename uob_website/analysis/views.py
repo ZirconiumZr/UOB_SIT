@@ -138,7 +138,7 @@ def history(request):
                 analysisSelectionForm = AnalysisSelectionForm(request.POST)
                 if analysisSelectionForm.is_valid():
                     print('valid checked')
-                    analysis_selected = analysisSelectionForm.cleaned_data.get('analysisChoices')
+                    analysis_selected = analysisSelectionForm.cleaned_data.get('analysisChoices') #['1', '2']
                     print('analysisChoices: ', analysis_selected)
                     choices = AnalysisSelection.objects.all()
                     json_analysis_selection = {}

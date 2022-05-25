@@ -196,7 +196,7 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 {% comment %} <a href="{% url 'analysis:history' %}"><button type="submit" class="btn btn-primary" id="modal_singleStart" name="modal_singleStart" value={{audio.audio_id}} onclick="location.href='{% url 'analysis:history' %}'">Start</button></a> {% endcomment %}
-                                                <button type="submit" class="btn btn-primary" id="modal_singleStart" name="modal_singleStart" value={{audio.audio_id}}>Start</button>
+                                                <button type="submit" class="btn btn-primary" id="modal_singleStart" name="modal_singleStart" value="{{audio.audio_id}}">Start</button>
                                             </div>
                                         </div>
                                         </div>
@@ -294,8 +294,8 @@
 
 {% comment %} <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script> {% endcomment %}
 
-<!-- refresh page for update status of analysis start button -->
 <script language="javascript" type="text/javascript">
+    // ***** refresh page for update status of analysis start button ***** //
     $(document).ready(function(){
         var interval = setInterval(function(){
             if ("{{flag_analysisThread_active}}" === "True"){
@@ -307,6 +307,21 @@
                 console.log('stop interval')
             }
         }, 90000);  //refresh every 90s
+    });
+
+    // *****  disabled "SD+STT" option to make it a necessary choice ***** //
+    $(document).ready(function(){
+        $("input[name='analysisChoices']").each(function(){
+            if ($(this).val() === "1"){
+                $(this).prop("checked",true)
+                {% comment %} $(this).prop("disabled",true) {% endcomment %} //"disabled" doesn't let any form of data to get POSTed. - https://stackoverflow.com/questions/61481957/display-a-checkbox-choice-as-disabled-in-django-3-0-modelform
+                $(this).attr("class","form-check-input me-1 readonly")
+                $(this).attr("style","opacity: .50; filter: alpha(opacity=50); cursor: default;")
+            }
+        });
+        $('input.readonly').on('click', function(evt) {
+            evt.preventDefault();
+        })
     });
 </script>
 
