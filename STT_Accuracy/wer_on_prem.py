@@ -37,7 +37,7 @@ data['D']=data.apply(lambda x:get_edit(x['transcript'],x['stt'])['D'],axis=1)
 data['S']=data.apply(lambda x:get_edit(x['transcript'],x['stt'])['S'],axis=1)
 data['N']=data.apply(lambda x:get_edit(x['transcript'],x['stt'])['N'],axis=1)
 
-data['Accuracy']=data.apply(lambda x:(x['N']-x['I']-x['D']-x['S'])/x['N'],axis=1)
+data['Accuracy']=data.apply(lambda x: (x['N']-x['I']-x['D']-x['S'])/x['N'] if (x['N']-x['I']-x['D']-x['S'])/x['N']>=0 else 0 ,axis=1)
 
 data.to_csv("example_results.csv",index=False,header=True)
 
