@@ -38,19 +38,11 @@ text2 = "i'm from uob and i'm fine in u o b"
 
 text3 = "you can get youll be credit card"
 
-swear_words=['arse','ass','asshole',
-             'bastard','bitch','bollocks','brotherfucker','bugger','bullshit',
-             'childfucker','cocksucker','crap','cunt',
-             'damn',
-             'effing',
-             'fatherfucker','frigger','fuck',
-             'goddamn','godsdamn',
-             'hell','horseshit',
-             'motherfucker',
-             'nigga',
-             'piss','prick',
-             'shit','sisterfucker','slut',
-             'twat']
+swear_corpus=[]
+with open("swear_words_list.txt","r") as f:
+  for word in f.readlines():
+    word = word.strip('\n')
+    swear_corpus.append(word)
 
 def pos_replace(l, template):
     '''
@@ -60,7 +52,7 @@ def pos_replace(l, template):
     '''
     flag_change = ""
     words = word_tokenize(l)
-    words = [w if w not in swear_words else '*'*len(w) for w in words]
+    words = [w if w not in swear_corpus else '*'*len(w) for w in words]
     # l_r = TreebankWordDetokenizer().detokenize(words)
     l_r = " ".join(words)
     for i in range(len(template)):
