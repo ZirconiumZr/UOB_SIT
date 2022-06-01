@@ -23,11 +23,16 @@ from analysis.resemblyzer.hparams import *
 
 import os
 import numpy as np
+import pandas as pd
+import shutil
 from datetime import datetime
 import filetype
-import zipfile, rarfile
+import zipfile, rarfile, py7zr
 
-from analysis import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_label, uob_storage, uob_superresolution, uob_utils
+from analysis import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_speechenhancement_new, uob_label, uob_storage, uob_superresolution, uob_utils
+from analysis.uob_init import(
+    stt_replace_template
+)
 
 
 def process_upload_file(upload_filename, upload_filepath):
@@ -53,15 +58,33 @@ def process_upload_file(upload_filename, upload_filepath):
             os.mkdir(zip_folder)
             
         zip = zipfile.ZipFile(upload_file)
-        for name in zip.namelist():
-            zip.extract(name, zip_folder)
+        zip.extractall(path=zip_folder)
+        zip.close()
+        ## Delete irregular files
+        namelist_toDel = [name for name in os.listdir(zip_folder) if not os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist_toDel:
+            shutil.rmtree(os.path.join(zip_folder, name))
+
+        ## Process regular file
+        namelist = [name for name in os.listdir(zip_folder) if os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist:
+            # zip.extract(name, zip_folder)  #zip.namelist()
             unzip_extension, unzip_mime = uob_utils.check_file_type(name, zip_folder)
             to_audioname = os.path.splitext(name)[0]+'.wav'
             to_audiopath = zip_folder
-            if unzip_extension != 'wav' or unzip_mime != 'audio/x-wav':
+            print(name, unzip_extension, unzip_mime)
+            if unzip_extension == None or unzip_mime == None:
+                os.remove(os.path.join(zip_folder, name))
+                print('Cannot get file extension or mime! The file will be removed.')
+                continue
+            
+            if (unzip_extension != 'wav' or unzip_mime != 'audio/x-wav') and unzip_mime.startswith('audio'):
                 uob_utils.audio2wav(from_audioname=name, from_audiopath=zip_folder, to_audioname=to_audioname, to_audiopath=to_audiopath)
                 os.remove(os.path.join(zip_folder, name))
-        return len(os.listdir(zip_folder)), 'compressed', to_audioname, to_audiopath
+            elif not unzip_mime.startswith('audio'):
+                os.remove(os.path.join(zip_folder, name))
+                print('remove non-audio file:',name)
+        return len(os.listdir(zip_folder)), 'compressed', '*', zip_folder
         
         
     elif upload_extension == 'rar' and upload_mime == 'application/x-rar-compressed':
@@ -70,15 +93,66 @@ def process_upload_file(upload_filename, upload_filepath):
             os.mkdir(zip_folder)
         
         rar = rarfile.RarFile(upload_file)
-        for name in rar.namelist():
-            rar.extract(name, zip_folder)
+        rar.extractall(path=zip_folder)
+        rar.close()
+        ## Delete irregular files
+        namelist_toDel = [name for name in os.listdir(zip_folder) if not os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist_toDel:
+            shutil.rmtree(os.path.join(zip_folder, name))
+        
+        ## Process regular file
+        namelist = [name for name in os.listdir(zip_folder) if os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist:
+            # rar.extract(name, zip_folder)  # rar.namelist()
             unzip_extension, unzip_mime = uob_utils.check_file_type(name, zip_folder)
             to_audioname = os.path.splitext(name)[0]+'.wav'
             to_audiopath = zip_folder
-            if unzip_extension != 'wav' or unzip_mime != 'audio/x-wav':
+            print(name, unzip_extension, unzip_mime)
+            if unzip_extension == None or unzip_mime == None:
+                os.remove(os.path.join(zip_folder, name))
+                print('Cannot get file extension or mime! The file will be removed.')
+                continue
+            
+            if (unzip_extension != 'wav' or unzip_mime != 'audio/x-wav') and unzip_mime.startswith('audio'):
                 uob_utils.audio2wav(from_audioname=name, from_audiopath=zip_folder, to_audioname=to_audioname, to_audiopath=to_audiopath)
                 os.remove(os.path.join(zip_folder, name))
-        return len(os.listdir(zip_folder)), 'compressed', to_audioname, to_audiopath
+            elif not unzip_mime.startswith('audio'):
+                os.remove(os.path.join(zip_folder, name))
+                print('remove non-audio file:',name)
+        return len(os.listdir(zip_folder)), 'compressed', '*', zip_folder
+    
+    
+    elif upload_extension == '7z' and upload_mime == 'application/x-7z-compressed':
+        zip_folder = os.path.join(upload_filepath, upload_purename)
+        if not os.path.exists(zip_folder): 
+            os.mkdir(zip_folder)
+        
+        sevenZip = py7zr.SevenZipFile(upload_file)
+        sevenZip.extractall(path=zip_folder)
+        sevenZip.close()
+        ## Delete irregular files
+        namelist_toDel = [name for name in os.listdir(zip_folder) if not os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist_toDel:
+            shutil.rmtree(os.path.join(zip_folder, name))
+        
+        ## Process regular file
+        namelist = [name for name in os.listdir(zip_folder) if os.path.isfile(os.path.join(zip_folder,name))]
+        for name in namelist:        
+            unzip_extension, unzip_mime = uob_utils.check_file_type(name, zip_folder)
+            to_audioname = os.path.splitext(name)[0]+'.wav'
+            to_audiopath = zip_folder
+            print(name, unzip_extension, unzip_mime)
+            if unzip_extension == None or unzip_mime == None:
+                os.remove(os.path.join(zip_folder, name))
+                print('Cannot get file extension or mime! The file will be removed.')
+                continue
+            
+            if (unzip_extension != 'wav' or unzip_mime != 'audio/x-wav') and unzip_mime.startswith('audio'):
+                uob_utils.audio2wav(from_audioname=name, from_audiopath=zip_folder, to_audioname=to_audioname, to_audiopath=to_audiopath)
+                os.remove(os.path.join(zip_folder, name))
+            elif not unzip_mime.startswith('audio'):
+                os.remove(os.path.join(zip_folder, name))
+        return len(os.listdir(zip_folder)), 'compressed', '*', zip_folder
     
     
     else:
@@ -88,7 +162,7 @@ def process_upload_file(upload_filename, upload_filepath):
 
 
 
-def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, superresolution:bool=False, sd_proc='pyannoteaudio'):
+def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=None, se_model_new=None, sr_model=None, vad_model=None, sv_model=None, pipeline=None, chunks:bool=True, reducenoise:bool=False, speechenhance:bool=False, speechenhance_new:bool=False, superresolution:bool=False, sd_proc='pyannoteaudio'):
     ## Reduce noise
     if reducenoise == True:
         ## load nr models
@@ -126,7 +200,25 @@ def sd_process(y, sr, audioname, audiopath, audiofile, nr_model=None, se_model=N
             namec = namec[1:]
             audioname = '%s.%s'%(namef+'_se',namec)
             sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+    
+    
+    ## Speech Enhancement new
+    if speechenhance_new == True:
+        y = malaya_speech_enhance_new(y, sr, se_model_new = se_model_new)
         
+        if chunks:
+            namef, namec = os.path.splitext(audioname)
+            namef_other, namef_index = namef.rsplit("_", 1)
+            namef_index = int(namef_index)
+            namec = namec[1:]
+            audioname = '%s_%04d.%s'%(namef_other+'_se',namef_index,namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+        else:
+            namef, namec = os.path.splitext(audioname)
+            namec = namec[1:]
+            audioname = '%s.%s'%(namef+'_se',namec)
+            sf.write(os.path.join(audiopath,audioname), y, sr) # TODO: how to save wav? delete the file after done?
+    
     
     ## Super Resolution
     if superresolution == True:
@@ -190,6 +282,17 @@ def stt_process(sttModel, slices_path, rec, sr):
         stt_result = uob_stt.stt_conversion_vosk(slices_path, rec, sr)
     elif sttModel == 'malaya-speech':
         stt_result = uob_stt.stt_conversion_malaya_speech(slices_path, rec)
+    
+    ## POS Tagger manually replace words
+    if os.path.exists(path=stt_replace_template):
+        print('Go to pos tagger replace...')
+        template = pd.read_csv(stt_replace_template)
+        text_replace = []
+        for index, row in stt_result.iterrows():
+            l_r = uob_stt.pos_replace(l = row["text"], template = template)
+            text_replace.append(str(l_r))
+        stt_result['text'] = text_replace
+        
     return stt_result
 
 def speaker_label_func(transactionDf, pretrained_model_path, checklist_path):
@@ -223,7 +326,12 @@ def malaya_speech_enhance(y, sr, se_model):
     speechenhanced_audio =uob_speechenhancement.get_se_output(y, sr, se_model)
     y = speechenhanced_audio
     return y
-    
+
+def malaya_speech_enhance_new(y, sr, se_model_new):
+    ### * Enhance the Speech
+    speechenhanced_audio =uob_speechenhancement_new.get_se_output(y, sr, se_model_new)
+    y = speechenhanced_audio
+    return y
     
 def malaya_super_resolution(y, sr, sr_model):
     ### * Convert to Super Resolution Audio

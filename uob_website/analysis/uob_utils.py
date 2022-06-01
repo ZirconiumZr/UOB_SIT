@@ -3,7 +3,6 @@ from logging import exception
 import os
 import shutil
 from typing import Any, Optional
-from hamcrest import starts_with
 from pydub import AudioSegment
 import wave
 import filetype # to check file type
@@ -14,6 +13,7 @@ def check_file_type(audioname, audiopath):
     kind = filetype.guess(audiofile)
     if kind is None:
         print('Cannot guess file type!')
+        return None, None
 
     print('File extension: %s' % kind.extension)
     print('File MIME type: %s' % kind.mime)

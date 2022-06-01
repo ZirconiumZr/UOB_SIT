@@ -8,13 +8,14 @@ import pandas as pd
 from pyannote.audio import Pipeline as pa_Pipeline
 from sqlalchemy import null
 
-from analysis import (uob_audiosegmentation, uob_mainprocess, uob_noisereduce, uob_speechenhancement, uob_superresolution,
+from analysis import (uob_audiosegmentation, uob_mainprocess, uob_noisereduce, uob_speechenhancement, uob_speechenhancement_new, uob_superresolution,
                       uob_speakerdiarization, uob_stt, uob_storage)
 from .uob_init import (
     pretrained_model_path,
     segmentation_threshold,
     FLG_REDUCE_NOISE,
     FLG_SPEECH_ENHANCE,
+    FLG_SPEECH_ENHANCE_NEW,
     FLG_SUPER_RES,
     sttModel,
     sdModel,
@@ -30,6 +31,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     ## audio preprocessing
     nr_model = uob_noisereduce.load_noisereduce_model_local(quantized=False) if FLG_REDUCE_NOISE else None
     se_model = uob_speechenhancement.load_speechenhancement_model_local(quantized=False) if FLG_SPEECH_ENHANCE else None
+    se_model_new = uob_speechenhancement_new.load_speechenhancement_model_local() if FLG_SPEECH_ENHANCE_NEW == True else None
     sr_model = uob_superresolution.load_superresolution_model_local(quantized=False) if FLG_SUPER_RES else None
     
     ## SD
@@ -77,6 +79,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                                                         audiofile=file,
                                                         nr_model=nr_model,   # ?: [nr_model, nr_quantized_model]
                                                         se_model=se_model,
+                                                        se_model_new=se_model_new,
                                                         sr_model=sr_model,
                                                         vad_model=vad_model_vggvox2,
                                                         sv_model=sv_model_speakernet,    # ?: sv_model_speakernet, sv_model_vggvox2
@@ -84,6 +87,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                                                         chunks=True, #fixed
                                                         reducenoise=FLG_REDUCE_NOISE,
                                                         speechenhance=FLG_SPEECH_ENHANCE,
+                                                        speechenhance_new=FLG_SPEECH_ENHANCE_NEW,
                                                         superresolution=FLG_SUPER_RES,
                                                         sd_proc=sdModel)  # ?: [pyannoteaudio, malaya, resemblyzer]
                         
@@ -115,6 +119,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                                             audiofile=audio_file,
                                             nr_model=nr_model,   # ?: [nr_model, nr_quantized_model]
                                             se_model=se_model,
+                                            se_model_new=se_model_new,
                                             sr_model=sr_model,
                                             vad_model=vad_model_vggvox2,
                                             sv_model=sv_model_speakernet,    # ?: sv_model_speakernet, sv_model_vggvox2
@@ -122,6 +127,7 @@ def sd_and_stt(audio, starttime, analysis_name):
                                             chunks=False, #fixed
                                             reducenoise=FLG_REDUCE_NOISE, 
                                             speechenhance=FLG_SPEECH_ENHANCE,
+                                            speechenhance_new=FLG_SPEECH_ENHANCE_NEW,
                                             superresolution=FLG_SUPER_RES,
                                             sd_proc=sdModel)  # ?: [pyannoteaudio, malaya, resemblyzer]
 
@@ -177,9 +183,9 @@ def sd_and_stt(audio, starttime, analysis_name):
         if FLG_SUPER_RES == True:
             if FLG_REDUCE_NOISE == False:
                 filename_forSlices = namef + "_sr.wav"
-            elif FLG_REDUCE_NOISE == True and FLG_SPEECH_ENHANCE == False:
+            elif FLG_REDUCE_NOISE == True and (FLG_SPEECH_ENHANCE == False and FLG_SPEECH_ENHANCE_NEW == False):
                 filename_forSlices = namef + "_nr_sr.wav"
-            elif FLG_REDUCE_NOISE == True and FLG_SPEECH_ENHANCE == True:
+            elif FLG_REDUCE_NOISE == True and (FLG_SPEECH_ENHANCE == True or FLG_SPEECH_ENHANCE_NEW == True):
                 filename_forSlices = namef + "_nr_se_sr.wav"
             else:
                 raise Exception(
@@ -188,9 +194,9 @@ def sd_and_stt(audio, starttime, analysis_name):
         else:
             if FLG_REDUCE_NOISE == False:
                 filename_forSlices = namef + ".wav"
-            elif FLG_REDUCE_NOISE == True and FLG_SPEECH_ENHANCE == False:
+            elif FLG_REDUCE_NOISE == True and (FLG_SPEECH_ENHANCE == False and FLG_SPEECH_ENHANCE_NEW == False):
                 filename_forSlices = namef + "_nr.wav"
-            elif FLG_REDUCE_NOISE == True and FLG_SPEECH_ENHANCE == True:
+            elif FLG_REDUCE_NOISE == True and (FLG_SPEECH_ENHANCE == True or FLG_SPEECH_ENHANCE_NEW == True):
                 filename_forSlices = namef + "_nr_se.wav"
             else:
                 raise Exception(
@@ -242,7 +248,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     
     uob_storage.dbInsertSTT(finalDf=final, audio_id=audio.audio_id, slices_path=slices_path)
     
-    if FLG_REDUCE_NOISE or FLG_SPEECH_ENHANCE or FLG_SUPER_RES:
+    if FLG_REDUCE_NOISE or FLG_SPEECH_ENHANCE or FLG_SPEECH_ENHANCE_NEW or FLG_SUPER_RES:
         if chunksfolder != '':
             audio_name_processed = "*"
             path_processed = chunksfolder+"_processed/" if flg_slice_orig == False else chunksfolder

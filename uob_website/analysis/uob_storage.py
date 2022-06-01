@@ -113,7 +113,7 @@ def dbInsertSTT(finalDf, audio_id, slices_path):
         #from dataframe"output" to get the SD, STT and label results
             # Create a new record
             sql = "INSERT INTO `analysis_sttresult` (`audio_slice_id`, `audio_id`, `slice_id`,`start_time`,`end_time`,`duration`,`text`,`speaker_label`,`slice_name`,`slice_path`,`create_by`,`create_date`,`create_time`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            for i in range(0,len(resultDf)-1):
+            for i in range(0,len(resultDf)):
                 audio_slice_id = audio_id+"_"+str(resultDf['index'][i])
                 cursor.execute(sql, (audio_slice_id, audio_id, resultDf['index'][i], resultDf.starttime[i],resultDf.endtime[i],resultDf.duration[i],resultDf.text[i],resultDf.label[i],resultDf.slice_wav_file_name[i],slices_path,str(os.getlogin()),time.strftime("%Y-%m-%d"),time.strftime("%H:%M:%S")))
 

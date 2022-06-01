@@ -91,6 +91,10 @@ def upload(request):
                 audio.audio_meta = uob_utils.get_audio_meta(audioname=audio.audio_name, audiopath=audio.path_orig)
                 audio.description = upload_desc
                 audio.analysis = {}
+                audio.create_date = time.strftime("%Y-%m-%d")
+                audio.create_time = time.strftime("%H:%M:%S")
+                audio.update_date = time.strftime("%Y-%m-%d")
+                audio.update_time = time.strftime("%H:%M:%S")
                 audio.save()
             elif upload_filetype_general == 'compressed':
                 for unzip_audioname in os.listdir(upzip_audio_path):
@@ -104,6 +108,10 @@ def upload(request):
                     audio.audio_meta = uob_utils.get_audio_meta(audioname=audio.audio_name, audiopath=audio.path_orig)
                     audio.description = upload_desc
                     audio.analysis = {}
+                    audio.create_date = time.strftime("%Y-%m-%d")
+                    audio.create_time = time.strftime("%H:%M:%S")
+                    audio.update_date = time.strftime("%Y-%m-%d")
+                    audio.update_time = time.strftime("%H:%M:%S")
                     audio.save()
                     
                 
@@ -217,7 +225,7 @@ def history(request):
     activeAnalysis_audioId_list = [name.split('-')[-1] for name in [name for name in threadNameList if 'djAnalysisThread' in name]]
     audioList_unanalysis = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()), analysis='{}')
     audioList = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()))
-    audioList = audioList.order_by('-create_date','-create_time')
+    audioList = audioList.order_by('-create_date','-create_time','-audio_id')
     analysisSelectionForm = AnalysisSelectionForm()
     context = {
         'audioList': audioList,
