@@ -57,7 +57,7 @@ def pos_replace(l, template):
     profanity
     '''
     p_once = re.sub(p_pattern, " *** ", ' '+l+' ')
-    p_twice = re.sub(p_pattern, " *** ", once)
+    p_twice = re.sub(p_pattern, " *** ", p_once)
     l_p = p_twice.strip(' ')
     '''
     pos tagger
