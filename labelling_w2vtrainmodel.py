@@ -19,7 +19,7 @@ stop_words = 'nan'
 
 # training data preparation
 def preprocess(doc):
-    doc = doc.lower()  # Lower the text.
+    doc = str(doc).lower()  # Lower the text.
     doc = word_tokenize(doc)  # Split into words.
     doc = [w for w in doc if not w in stop_words]  # Remove stopwords.
     doc = [w for w in doc if w.isalpha()]  # Remove numbers and punctuation.
