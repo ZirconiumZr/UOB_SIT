@@ -1,5 +1,5 @@
 # UOB_SIT
-UOB_SIT_Version
+malaya-speech_finetune
 
 fine-tuning data set making: 
 A guidance of preparing fine-tuning data set
