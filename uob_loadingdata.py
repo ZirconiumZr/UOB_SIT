@@ -68,7 +68,7 @@ class UOBSinglish(datasets.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         root_path = dl_manager.extract("./drive/MyDrive/MrBrown/Easting.zip")
-        #root_path = dl_manager.download_and_extract(_DL_URL)
+        #root_path = dl_manager.download_and_extract(_DL_URL) #use this when you want to get data from web
         root_path = os.path.join(root_path, "Easting")
         train_wav_path = os.path.join(root_path, "train")
         train_csv_path = os.path.join(root_path, "train.csv")
