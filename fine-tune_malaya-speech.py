@@ -14,8 +14,8 @@ else:
 # get the fine-tune training and testing data
 from datasets import load_dataset, load_metric, Audio
 # "load_dataset" is a function using script to loading data, put the path to your data_loading script(should be a python script with .py format)
-uob_voice_train = load_dataset("/content/drive/MyDrive/MrBrown/uob_loadingdata.py", split="train")# path/to/your/loading_data/transcript
-uob_voice_test = load_dataset("/content/drive/MyDrive/MrBrown/uob_loadingdata.py", split="test")# path/to/your/loading_data/transcript
+uob_voice_train = load_dataset("/content/drive/MyDrive/MrBrown/uob_loadingdata.py", split="train", cache_dir="path/to/the/place/you/want/to/storing/the/loaded/dataset")# path/to/your/loading_data/transcript
+uob_voice_test = load_dataset("/content/drive/MyDrive/MrBrown/uob_loadingdata.py", split="test", cache_dir="path/to/the/place/you/want/to/storing/the/loaded/dataset")# path/to/your/loading_data/transcript
 
 # check whether the Dataset format data have been prepaired, and the information of the training and testing datasets
 print(uob_voice_train)
