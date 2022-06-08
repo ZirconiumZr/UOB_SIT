@@ -33,10 +33,11 @@ _CITATION = """\
 """
 
 _DESCRIPTION = """\
-This is a public domain speech dataset consisting of 3579 short audio clips of singlish
+This is a public domain speech dataset consisting of 3579 short audio clips of singlish//
+This is YouTuber MrBrown's coprus//
+...
 """
 
-_DL_URL = "https://docs.google.com/uc?export=download&id=1BtaSyRAOfNU9fZmEFQmy3hpNPaVH5ziS"
 
 class UOBSinglish(datasets.GeneratorBasedBuilder):
     """Singlish dataset."""
