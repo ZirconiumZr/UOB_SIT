@@ -22,6 +22,7 @@ from scipy.ndimage.morphology import binary_dilation
 from analysis.resemblyzer.hparams import *
 
 import os
+import re
 import numpy as np
 import pandas as pd
 import shutil
@@ -31,7 +32,8 @@ import zipfile, rarfile, py7zr
 
 from analysis import uob_noisereduce, uob_speakerdiarization, uob_audiosegmentation, uob_stt, uob_speechenhancement, uob_speechenhancement_new, uob_label, uob_storage, uob_superresolution, uob_utils
 from analysis.uob_init import(
-    stt_replace_template
+    stt_replace_template,
+    profanity_list
 )
 
 
@@ -282,6 +284,11 @@ def stt_process(sttModel, slices_path, rec, sr):
         stt_result = uob_stt.stt_conversion_vosk(slices_path, rec, sr)
     elif sttModel == 'malaya-speech':
         stt_result = uob_stt.stt_conversion_malaya_speech(slices_path, rec)
+
+
+    ### Extra Steps
+    # 1. word replacement: pos_tagger & direct replace
+    # 2. profanity handling: masking
     
     ## POS Tagger manually replace words
     if os.path.exists(path=stt_replace_template):
@@ -289,8 +296,26 @@ def stt_process(sttModel, slices_path, rec, sr):
         template = pd.read_csv(stt_replace_template)
         text_replace = []
         for index, row in stt_result.iterrows():
-            l_r = uob_stt.pos_replace(l = row["text"], template = template)
+            l = str(row["text"])
+            l_r = uob_stt.pos_replace(l = l, template = template)
             text_replace.append(str(l_r))
+        stt_result['text'] = text_replace
+    
+    ## Profanity handling
+    if os.path.exists(path=profanity_list):
+        print('Go to profanity handling...')
+        swear_corpus=[]
+        with open(profanity_list,"r") as f:
+            for word in f.readlines():
+                word = word.strip()
+                if len(word) !=0:
+                    swear_corpus.append(' '+word+' ')
+        p_pattern = re.compile("|".join(swear_corpus))
+        text_replace = []
+        for index, row in stt_result.iterrows():
+            l = str(row["text"])
+            l_p = uob_stt.profanity_handling(l = l, p_pattern = p_pattern)
+            text_replace.append(str(l_p))
         stt_result['text'] = text_replace
         
     return stt_result
