@@ -5,7 +5,7 @@ pretrained_model_path = 'D:/EBAC/Internship/UOB/Projects/pretrained-model/'
 
 SAMPLE_RATE = 44100
 STT_SAMPLERATE = 16000
-FLG_REDUCE_NOISE:bool = False
+FLG_REDUCE_NOISE:bool = True
 FLG_SPEECH_ENHANCE:bool = False
 FLG_SPEECH_ENHANCE_NEW:bool = False
 FLG_SUPER_RES:bool = False
@@ -15,7 +15,7 @@ label_checklist = 'checklist.txt'
 
 segmentation_threshold = 1800  #if audio_duration > segmentation_threshold(seconds), then segment
 sd_global_starttime = 0.0
-sttModel = 'vosk' # ? ['malaya-speech', 'vosk']
+sttModel = 'malaya-speech' # ? ['malaya-speech', 'vosk']
 sdModel = 'resemblyzer' # ? [pyannoteaudio, malaya, resemblyzer]
 
 flg_slice_orig = True
