@@ -51,7 +51,7 @@ def sd_and_stt(audio, starttime, analysis_name, username):
     chunksfolder = ''
     audio_duration = json.loads(audio.audio_meta)["duration"]
     if audio_duration > segmentation_threshold:  # segment if longer than 5 min=300s
-        totalchunks, chunksfolder = uob_audiosegmentation.audio_segmentation(name=audio.audio_name,file=audio.path_orig,savetime=savetime)
+        totalchunks, chunksfolder = uob_audiosegmentation.audio_segmentation(name=audio.audio_name,path=audio.path_orig,savetime=savetime)
         num_audio_files = totalchunks
         print('chunksfolder: ', chunksfolder)
         print('Segmentation Done!!!\n','*' * 30)
