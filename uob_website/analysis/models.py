@@ -31,7 +31,7 @@ class Audio(models.Model):
 
 
     def __str__(self):
-        return self.audio_name
+        return self.audio_id
     # def __unicode__ (self):
     #     return  u' %s '%(self.audio_name)
     
@@ -57,7 +57,7 @@ class STTresult(models.Model):
     create_time = models.TimeField(null=False,default=time.strftime("%H:%M:%S"))
     
     def __str__(self):
-        return self.slice_name
+        return self.audio_slice_id
     
     def slice_path_last_folder(self):
         folder_tree_list =  self.slice_path.split('/')

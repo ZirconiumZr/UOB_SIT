@@ -25,7 +25,7 @@ from .uob_init import (
 )
 
 
-def sd_and_stt(audio, starttime, analysis_name):
+def sd_and_stt(audio, starttime, analysis_name, username):
     #### * Load Models
     print('Pretrained Models Loading Start')
     ## audio preprocessing
@@ -246,7 +246,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     print('*'*30)
     print("Insert Output to Database Start")
     
-    uob_storage.dbInsertSTT(finalDf=final, audio_id=audio.audio_id, slices_path=slices_path)
+    uob_storage.dbInsertSTT(finalDf=final, audio_id=audio.audio_id, slices_path=slices_path, username=username)
     
     if FLG_REDUCE_NOISE or FLG_SPEECH_ENHANCE or FLG_SPEECH_ENHANCE_NEW or FLG_SUPER_RES:
         if chunksfolder != '':
@@ -268,6 +268,7 @@ def sd_and_stt(audio, starttime, analysis_name):
     analysis = json.dumps(analysis)
     print('json string analysis:', analysis)
     uob_storage.dbUpdateAudio_processedInfo(audio_id = audio.audio_id, 
+                                            username = username,
                                             audio_name_processed = audio_name_processed, 
                                             path_processed = path_processed,
                                             analysis = analysis
