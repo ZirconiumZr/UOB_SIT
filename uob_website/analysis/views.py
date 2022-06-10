@@ -315,7 +315,7 @@ def history(request):
         'audioList_unanalysis': audioList_unanalysis
     }
     print('flag_analysisThread_active:',flag_analysisThread_active)
-    if flag_analysisThread_currUser_active == False: globals()[globals()['queueItem_{}'.format(request.user.username)]] = None
+    if flag_analysisThread_currUser_active == False: globals()['queueItem_{}'.format(request.user.username)] = None
     return render(request, template_name='analysis/history.html', context=context)
 
 
