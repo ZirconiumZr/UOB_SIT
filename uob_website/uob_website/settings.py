@@ -139,4 +139,4 @@ LOGIN_REDIRECT_URL = "main"  # new
 LOGOUT_REDIRECT_URL = "main"  # new
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'   # session engine(default)
-SESSION_COOKIE_AGE = 6000   # Session's cookie expire time (600s)
+SESSION_COOKIE_AGE = 6000   # Session's cookie expire time in seconds (6000s)
