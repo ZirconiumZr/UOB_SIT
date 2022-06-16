@@ -1,7 +1,7 @@
 import logging
 import os
 
-pretrained_model_path = 'D:/EBAC/Internship/UOB/Projects/pretrained-model/'
+pretrained_model_path = './analysis/pretrained-model/'
 
 SAMPLE_RATE = 44100
 STT_SAMPLERATE = 16000

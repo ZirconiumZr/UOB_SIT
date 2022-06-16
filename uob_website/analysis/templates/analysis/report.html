@@ -81,6 +81,10 @@
                     <th scope="col">End</th>
                     <th scope="col">Duration</th>
                     <th scope="col">Text</th>
+                    {% if personalInfo %}
+                    <th scope="col">KYC</th>
+                    <th scope="col">PII</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -107,7 +111,17 @@
                     <td>{{ slice.start_time }}</td>
                     <td>{{ slice.end_time }}</td>
                     <td>{{ slice.duration }}</td>
-                    <td>{{ slice.text }}</td>
+                    <td width = "1000">{{ slice.text }}</td>
+                    {% if personalInfo %}
+                    {% for info in personalInfo %}
+                    {% if slice.slice_id == info.slice_id  %}
+                    <td>{{ info.is_kyc }}</td>
+                    {% endif %}
+                    {% if slice.slice_id == info.slice_id  %}
+                    <td>{{ info.is_pii }}</td>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

@@ -15,13 +15,15 @@ from django.views.generic.edit import DeleteView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
+import pandas
 import analysis
+from django_pandas.io import read_frame
 
 from uob_website.settings import MEDIA_ROOT
 
 from .forms import AnalysisSelectionForm, UploadModelForm
-from .models import AnalysisSelection, Audio, STTresult
-from analysis import uob_main, uob_storage, uob_mainprocess, uob_utils
+from .models import AnalysisSelection, Audio, STTresult, PersonalInfo
+from analysis import uob_main, uob_storage, uob_mainprocess, uob_utils, uob_personalInfo
 from .uob_init import (
     FLG_REDUCE_NOISE,
     FLG_SPEECH_ENHANCE,
@@ -327,11 +329,14 @@ def report(request, audio_id):
     zip_folder = os.path.splitext(audio.upload_filename)[0]
     sttResult = STTresult.objects.filter(audio_id = audio_id)
     sttResult = sttResult.order_by("slice_id")
-    
+    personalInfo = PersonalInfo.objects.filter(audio_id = audio_id)
+    personalInfo = personalInfo.order_by("slice_id")
+
     context = {'audio': audio, 
                'audio_meta': audio_meta, 
                'zip_folder': zip_folder,
-               'sttResult': sttResult
+               'sttResult': sttResult,
+               'personalInfo': personalInfo
                }
     
     return render(request, 'analysis/report.html', context=context)
@@ -434,6 +439,7 @@ class AnalysisThread(threading.Thread):
             sdstt = STTresult.objects.filter(audio_id = queueItem.audio_id)
             print(self.analysis_selected)
             print(self.choices)
+            sttDf = pandas.DataFrame()
             for i in self.analysis_selected:
                 i_int = int(i)-1
                 self.json_analysis_selection[str(i_int)] = self.choices[i_int].analysis_name  #example: {"0":"SD+STT", "1":"use case 1"}
@@ -454,10 +460,21 @@ class AnalysisThread(threading.Thread):
                     print("SD+STT ends")
                     print('*'*30)
                     
-                if self.choices[i_int].analysis_name == 'use case 1':
+                if self.choices[i_int].analysis_name == 'KYC+PII':
                     print('*'*30)
-                    print("use case 1 starts")
-                    print("use case 1 ends")
+                    print("use KYC+PII starts")
+                    try:
+                        sttResult = STTresult.objects.filter(audio_id = queueItem.audio_id)
+                        # sttResult = sttResult.order_by("slice_id")
+                        sdstt = sttResult.values_list('audio_id','slice_id','text')
+                        sttDf = read_frame(sdstt, fieldnames = ['audio_id','slice_id','text'])
+                        print(sttDf)
+                        sttDf = uob_personalInfo.personalInfoDetector(sttDf)
+                        print(sttDf)
+                    except Exception as e1:
+                        print('KYC+PII fails out of Exception:', type(e1))
+                    uob_storage.dbInsertPersonalInfo(finalDf=sttDf, audio_id=queueItem.audio_id)               
+                    print("use KYC+PII ends")
                     print('*'*30)
                     
                 if self.choices[i_int].analysis_name == 'use case 3':

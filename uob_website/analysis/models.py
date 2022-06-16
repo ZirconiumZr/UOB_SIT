@@ -128,4 +128,17 @@ class Version(models.Model):
     def __str__(self):
         return self.version_name+": "+self.version_value
     
-        
+class PersonalInfo(models.Model):
+    class Meta:
+        unique_together=('audio_id','slice_id')
+        managed = True
+    
+    audio_slice_id = models.CharField(primary_key=True,max_length=30)
+    audio_id = models.CharField(max_length=30) 
+    slice_id = models.IntegerField() 
+    is_kyc = models.CharField(max_length=5)
+    is_pii = models.CharField(max_length=5)
+    
+    def __str__(self):
+        return self.slice_name        
+                

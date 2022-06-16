@@ -161,4 +161,24 @@ def dbInsertLog(audio_id, params, analysis_name, process_time, username=os.getlo
             cursor.execute(sql, (log_id, audio_id, params, analysis_name, process_time, str(username),date.today()))
             
         connection.commit()
-    
+
+def dbInsertPersonalInfo(finalDf, audio_id):
+    connection= connectDB()
+                        
+    # resultDf=finalDf.fillna(0)
+    resultDf = finalDf
+    with connection:
+        with connection.cursor() as cursor:
+            # connection is not autocommit by default. So you must commit to save your changes.
+            # connection.commit()
+            # audio_id_1=cursor.lastrowid
+        
+        #second: store result data to analysis_personalinfo table
+            # Create a new record
+            sql = "INSERT INTO `analysis_personalinfo` (`audio_slice_id`, `audio_id`, `slice_id`,`is_kyc`,`is_pii`) VALUES (%s, %s, %s, %s, %s)"
+            for i in range(0,len(resultDf)):
+                audio_slice_id = audio_id+"_"+str(resultDf['slice_id'][i])
+                cursor.execute(sql, (audio_slice_id, audio_id, resultDf['slice_id'][i], resultDf['is_kyc'][i], resultDf['is_pii'][i]))
+
+        # connection is not autocommit by default. So you must commit to save your changes.
+        connection.commit()        
