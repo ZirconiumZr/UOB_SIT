@@ -77,7 +77,14 @@ CREATE TABLE IF NOT EXISTS `analysis_analysisselection` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 
-
+ CREATE TABLE IF NOT EXISTS `analysis_personalinfo` (
+  `audio_slice_id` varchar(30) COLLATE utf8mb4_bin NOT NULL,
+  `audio_id` varchar(30) COLLATE utf8mb4_bin NOT NULL,
+  `slice_id` int NOT NULL,
+  `is_kyc` varchar(5) COLLATE utf8mb4_bin DEFAULT NULL,
+  `is_pii` varchar(5) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`audio_slice_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 -- -----------------------------------------------------------------------------------
 -- |                                Stored Procedures                                |
 -- -----------------------------------------------------------------------------------
