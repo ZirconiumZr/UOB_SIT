@@ -155,7 +155,7 @@
     $('#cb_hideEmptySlices').click(function(){
         if ($('#cb_hideEmptySlices').is(":checked")){
             $(this).prop("checked",true);
-            for(var i=0; i<{{sttResult.count}}; i++){
+            for(var i=0; i<={{sttResult.count}}; i++){
                 var col_text = $("#tbl_rpt").find("tr:eq("+i+") td:eq(6)").html();
                 if(col_text===''){
                     $("#tbl_rpt").find("tr:eq("+i+")").hide();
@@ -165,7 +165,7 @@
         }
         else{
             $(this).prop("checked",false)
-            for(var i=0; i<{{sttResult.count}}; i++){
+            for(var i=0; i<={{sttResult.count}}; i++){
                 var col_text = $("#tbl_rpt").find("tr:eq("+i+") td:eq(6)").html();
                 if(col_text===''){
                     $("#tbl_rpt").find("tr:eq("+i+")").show();
