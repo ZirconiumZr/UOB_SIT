@@ -517,7 +517,7 @@ def stt_exportcsv(request, audio_id):
     response = HttpResponse('text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s'%(filename)
     writer = csv.writer(response)
-    
+    piiinfoResult = PersonalInfo.objects.filter(audio_id = audio_id)
     ### Option1: Write all cols in database table
     # ## Write data header
     # field_names = [field.name for field in opts.fields]
@@ -528,10 +528,20 @@ def stt_exportcsv(request, audio_id):
     
     ### Option2: Write partial cols in database table
     ## Write data header
-    field_names = ['audio_id','slice_id','speaker_label','start_time','end_time','duration','text']
+    sttResult_tbl = sttResult.values_list('audio_id','slice_id','speaker_label','start_time','end_time','duration','text').order_by("slice_id")
+    if piiinfoResult:
+        from itertools import chain
+        field_names = ['audio_id','slice_id','speaker_label','start_time','end_time','duration','text','kyc','pii']
+        piiResult_tbl = piiinfoResult.values_list('slice_id', 'is_kyc','is_pii').order_by("slice_id").values_list('is_kyc','is_pii')
+        sttResult_tbl = list(sttResult_tbl)
+        piiResult_tbl = list(piiResult_tbl)
+        if len(sttResult_tbl) == len(piiResult_tbl):
+            for i in range(len(sttResult_tbl)):
+                sttResult_tbl[i] += piiResult_tbl[i]                    
+    else:     
+        field_names = ['audio_id','slice_id','speaker_label','start_time','end_time','duration','text']
     writer.writerow(field_names)
     ## Write data rows
-    sttResult_tbl = sttResult.values_list('audio_id','slice_id','speaker_label','start_time','end_time','duration','text')
     for slice in sttResult_tbl:
         writer.writerow(slice)
         

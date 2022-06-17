@@ -1,7 +1,11 @@
 import re
+import os
 from text2digits import text2digits
 from flair.data import Sentence
 from flair.models import SequenceTagger
+from analysis.uob_init import(
+    pretrained_model_path
+)
 
 def personalInfoDetector(sttDf):
     t2d = text2digits.Text2Digits()
@@ -18,7 +22,8 @@ def personalInfoDetector(sttDf):
     
     # pii detector
     # load the trained model
-    model = SequenceTagger.load(r'H:\UOB\PII-Train\PII_detection_Flair_custom_NER-main\resources\taggers\example-ner\best-model.pt')
+    modelPath = os.path.join(pretrained_model_path, 'ner/ner-model.pt')
+    model = SequenceTagger.load(modelPath)
     piiList=[ ]
     Label = [ ]
     list_of_sentences = sttDf['text'].values
