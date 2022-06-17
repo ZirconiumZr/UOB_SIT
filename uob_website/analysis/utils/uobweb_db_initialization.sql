@@ -113,5 +113,5 @@ CALL Initialize_analysis_version();
 --  analysis selection
 
 INSERT INTO `analysis_analysisselection` (`analysis_name`)
-     VALUES ('SD+STT');
+     VALUES ('SD+STT','KPC+PII');
 
