@@ -5,6 +5,8 @@ drop table `uobweb`.`analysis_sttresult`;
 drop table `uobweb`.`analysis_audio`;
 drop table `uobweb`.`analysis_versions`;
 drop table `uobweb`.`analysis_process_log`;
+drop table `uobweb`.`analysis_analysisselection`;
+drop table `uobweb`.`analysis_personalinfo`;
 drop procedure `uobweb`.`Initialize_analysis_versions`;
 
 CREATE TABLE IF NOT EXISTS `analysis_audio` (
@@ -112,6 +114,7 @@ END;
 CALL Initialize_analysis_version();
 --  analysis selection
 
-INSERT INTO `analysis_analysisselection` (`analysis_name`)
-     VALUES ('SD+STT','KPC+PII');
+INSERT INTO `uobweb`.`analysis_analysisselection` (`analysis_name`)
+     VALUES ('SD+STT'),
+            ('KYC+PII');
 
