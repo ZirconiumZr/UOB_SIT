@@ -3,6 +3,7 @@ import os
 from text2digits import text2digits
 from flair.data import Sentence
 from flair.models import SequenceTagger
+from piiregex import PiiRegex
 from analysis.uob_init import(
     pretrained_model_path
 )
@@ -22,21 +23,30 @@ def personalInfoDetector(sttDf):
     
     # pii detector
     # load the trained model
-    modelPath = os.path.join(pretrained_model_path, 'ner/ner-model.pt')
-    model = SequenceTagger.load(modelPath)
+    # modelPath = os.path.join(pretrained_model_path, 'ner/ner-model.pt')
+    # model = SequenceTagger.load(modelPath)
+    # piiList=[ ]
+    # Label = [ ]
+    # list_of_sentences = sttDf['text'].values
+    # for i in range(len(list_of_sentences)):
+    #     sentence = Sentence(list_of_sentences[i])
+    #     model.predict(sentence)
+    #     foo = sentence.to_dict(tag_type='ner')
+    #     if len(foo['ner']) > 0:       
+    #         Label.append(foo['ner'][0]['value'])
+    #         # PII.append(foo['ner'][0]['text'])
+    #         piiList.append('Yes')
+    #     else:
+    #         Label.append(' ')
+    #         piiList.append(' ')
     piiList=[ ]
-    Label = [ ]
     list_of_sentences = sttDf['text'].values
     for i in range(len(list_of_sentences)):
-        sentence = Sentence(list_of_sentences[i])
-        model.predict(sentence)
-        foo = sentence.to_dict(tag_type='ner')
-        if len(foo['ner']) > 0:       
-            Label.append(foo['ner'][0]['value'])
-            # PII.append(foo['ner'][0]['text'])
+        text = str(list_of_sentences[i])
+        parsed_text = PiiRegex(text)
+        if parsed_text.any_match():
             piiList.append('Yes')
         else:
-            Label.append(' ')
             piiList.append(' ')
     sttDf['is_pii'] = piiList
     return sttDf
