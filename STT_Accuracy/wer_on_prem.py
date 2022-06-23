@@ -10,10 +10,13 @@ Original file is located at
 import pandas as pd
 import Levenshtein
 import re
+import pandas as pd
 
 """# Load data with stt results and real transcript columns."""
 
-data=pd.read_csv("example.csv")
+data=pd.read_excel("example.xlsx")
+
+# data=pd.read_csv("example.csv")
 
 """# WER function"""
 
