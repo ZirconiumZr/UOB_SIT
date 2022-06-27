@@ -3,12 +3,7 @@ import os
 
 pretrained_model_path = 'D:/EBAC/Internship/UOB/Projects/pretrained-model/'
 
-SAMPLE_RATE = 44100
-STT_SAMPLERATE = 16000
 FLG_REDUCE_NOISE:bool = True
-FLG_SPEECH_ENHANCE = False
-FLG_SPEECH_ENHANCE_NEW = False
-FLG_SUPER_RES = False
 
 label_stop_words = 'nan'
 label_checklist = 'checklist.txt'
