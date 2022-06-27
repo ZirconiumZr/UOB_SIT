@@ -158,6 +158,11 @@ def process_upload_file(upload_filename, upload_filepath):
     
     
     else:
+        try:
+            os.remove(upload_file)
+        except Exception as e:
+            print('Remove file', upload_file, 'failed because of Exception', type(e), e)
+        
         raise ValueError(
             "Upload file type is not supported. Please upload pure audio file (wav, mp3) or compressed file (zip, rar)"
         )
