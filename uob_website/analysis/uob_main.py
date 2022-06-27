@@ -10,6 +10,7 @@ from gensim.models import Word2Vec
 
 from analysis import (uob_audiosegmentation, uob_label, uob_mainprocess, uob_noisereduce,
                       uob_speakerdiarization, uob_stt, uob_personalInfo, uob_storage)
+from analysis.models import Audio
 from .uob_init import (
     pretrained_model_path,
     segmentation_threshold,
@@ -212,6 +213,7 @@ def sd_and_stt(audio, starttime, analysis_name, username):
         audio_name_processed = None
         path_processed = None
     
+    audio = Audio.objects.get(audio_id = audio.audio_id)
     analysis = json.loads(audio.analysis)
     print('json object analysis:', analysis)
     if analysis_name not in analysis.values():
@@ -251,7 +253,8 @@ def kyc_and_pii(sttDf, audio, analysis_name, username):
     print('*'*30)
     print("Insert KYC & PII Output to Database Start")
     uob_storage.dbInsertPersonalInfo(finalDf=final, audio_id=audio.audio_id)  
-     
+    
+    audio = Audio.objects.get(audio_id = audio.audio_id)
     analysis = json.loads(audio.analysis)
     print('json object analysis:', analysis)
     if analysis_name not in analysis.values():

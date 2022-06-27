@@ -10,8 +10,8 @@ label_checklist = 'checklist.txt'
 
 segmentation_threshold = 600  #if audio_duration > segmentation_threshold(seconds), then segment
 
-sttModel = 'malaya-speech' # ? ['malaya-speech', 'vosk']
-sdModel = 'resemblyzer' # ? [pyannoteaudio, malaya, resemblyzer]
+sttModel = 'malaya-speech' # ? ['malaya-speech', 'malaya-wav2vec2']
+sdModel = 'resemblyzer' # ? [resemblyzer]
 
 stt_replace_template = './analysis/utils/stt_replace_template.csv'
 profanity_list = './analysis/utils/swear_words_list.txt'
