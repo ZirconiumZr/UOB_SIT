@@ -1,6 +1,13 @@
 import tensorflow as tf
 import os
 import logging
+import torch
+from torch import nn
+import numpy as np
+import librosa
+from time import perf_counter as timer
+from typing import Union, List
+from pathlib import Path
 
 import malaya_speech
 from malaya_speech.utils import (
@@ -9,35 +16,13 @@ from malaya_speech.utils import (
     generate_session,
     nodes_session,
 )
-
-# from malaya_speech.supervised import unet, classification
-from malaya_speech.model.tf import UNET, UNETSTFT, UNET1D
-
-from malaya_speech.utils import featurization
-from malaya_speech.config import (
-    speakernet_featurizer_config as speakernet_config,
-)
-from malaya_speech.model.tf import (
-    Speakernet,
-    Speaker2Vec,
-    SpeakernetClassification,
-    MarbleNetClassification,
-    Classification,
-)
-
+from malaya_speech.model.tf import UNETSTFT
 from malaya_speech.path import TRANSDUCER_VOCABS, TRANSDUCER_MIXED_VOCABS
 from malaya_speech.utils.subword import load as subword_load
 from malaya_speech.utils.tf_featurization import STTFeaturizer
 from malaya_speech.utils.read import load as load_wav
 from malaya_speech.model.tf import Transducer, TransducerAligner
 
-import torch
-from torch import nn
-import numpy as np
-import librosa
-from time import perf_counter as timer
-from typing import Union, List
-from pathlib import Path
 
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 from gensim.models import Word2Vec

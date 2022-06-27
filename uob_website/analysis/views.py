@@ -20,12 +20,9 @@ from uob_website.settings import MEDIA_ROOT
 
 from .forms import AnalysisSelectionForm, UploadModelForm
 from .models import AnalysisSelection, Audio, STTresult, PersonalInfo
-from analysis import uob_main, uob_storage, uob_mainprocess, uob_utils, uob_personalInfo
+from analysis import uob_main, uob_storage, uob_mainprocess, uob_utils
 from .uob_init import (
     FLG_REDUCE_NOISE,
-    FLG_SPEECH_ENHANCE,
-    FLG_SPEECH_ENHANCE_NEW,
-    FLG_SUPER_RES,
     sttModel,
     sdModel,
     userguide_path,
