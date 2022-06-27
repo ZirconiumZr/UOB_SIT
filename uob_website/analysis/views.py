@@ -459,7 +459,7 @@ class AnalysisThread(threading.Thread):
             print('duration: ', endtime-starttime)
             
             ### * Save to Log Table
-            params = json.dumps({"NR":FLG_REDUCE_NOISE, "SD":sdModel, "STT":sttModel, "KYC+PII":'xxx'})
+            params = json.dumps({"NR":FLG_REDUCE_NOISE, "SD":sdModel, "STT":sttModel})
             analysis_name = json.dumps(self.json_analysis_selection)
             message = ''
             process_time = '{"starttime":"%s", "endtime":"%s", "duration":"%s"}'%(starttime,endtime,endtime-starttime)

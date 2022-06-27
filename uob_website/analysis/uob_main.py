@@ -244,11 +244,7 @@ def sd_and_stt(audio, starttime, analysis_name, username):
 
 def kyc_and_pii(sttDf, audio, analysis_name, username):
     #### * Process PersonalInfo Detection
-    print('*'*30)
-    print("KYC & PII Detection Start")
     final = uob_personalInfo.personalInfoDetector(sttDf)
-    print("KYC & PII Detection Done")
-    print('*'*30)
     
     
     #### * Store output to database
