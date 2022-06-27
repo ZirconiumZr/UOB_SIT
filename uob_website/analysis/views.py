@@ -23,6 +23,9 @@ from .models import AnalysisSelection, Audio, STTresult, PersonalInfo
 from analysis import uob_main, uob_storage, uob_mainprocess, uob_utils, uob_personalInfo
 from .uob_init import (
     FLG_REDUCE_NOISE,
+    FLG_SPEECH_ENHANCE,
+    FLG_SPEECH_ENHANCE_NEW,
+    FLG_SUPER_RES,
     sttModel,
     sdModel,
     userguide_path,
@@ -293,9 +296,7 @@ def history(request):
     time.sleep(1) # DO NOT DELETE!!! in case cannot get the running item in globals()
     if globals()['queueItem_{}'.format(request.user.username)] != None: activeAnalysis_audioId_list.append(globals()['queueItem_{}'.format(request.user.username)].audio_id)  # add the running item which was queue.get() from Queue
     ### Option 1: Using Windows Authentication
-    # audioList_unanalysis = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()), analysis='{}')
-    # audioList = Audio.objects.filter(flg_delete=None, create_by=str(os.getlogin()))
-    # audioList = audioList.order_by('-create_date','-create_time','-audio_id')
+    # replace "request.user.username" with "os.getlogin()"
     ### Option 2: Using Django Authentication
     analysisSelections = AnalysisSelection.objects.all()
     json_analysisSelections = {}
@@ -417,11 +418,10 @@ class AnalysisThread(threading.Thread):
                             print("SD+STT running", queueItem.audio_id)
                             uob_main.sd_and_stt(queueItem, starttime, self.choices[i_int].analysis_name, self.args['username'])
                         except Exception as e1:
-                            print('SD+STT fails out of Exception:', type(e1))
-                            print(e1) 
+                            print('SD+STT fails out of Exception:', type(e1), e1)
                     else:
-                        # raise ValueError("Audio "+audio_to_analysis.audio_id+" has been performed analysis of "+choices[i_int].analysis_name)
                         print("Warning: "+"Audio "+queueItem.audio_id+" has been performed analysis of "+self.choices[i_int].analysis_name)
+                        continue
                     
                     print("SD+STT ends")
                     print('*'*30)
@@ -429,17 +429,21 @@ class AnalysisThread(threading.Thread):
                 if self.choices[i_int].analysis_name == 'KYC+PII':
                     print('*'*30)
                     print("use KYC+PII starts")
-                    try:
-                        sttResult = STTresult.objects.filter(audio_id = queueItem.audio_id)
-                        # sttResult = sttResult.order_by("slice_id")
-                        sdstt = sttResult.values_list('audio_id','slice_id','text')
-                        sttDf = read_frame(sdstt, fieldnames = ['audio_id','slice_id','text'])
-                        print(sttDf)
-                        sttDf = uob_personalInfo.personalInfoDetector(sttDf)
-                        print(sttDf)
-                    except Exception as e1:
-                        print('KYC+PII fails out of Exception:', type(e1))
-                    uob_storage.dbInsertPersonalInfo(finalDf=sttDf, audio_id=queueItem.audio_id)               
+                    kycpii = PersonalInfo.objects.filter(audio_id = queueItem.audio_id)
+                    if not kycpii:
+                        try:
+                            print("KYC+PII running", queueItem.audio_id)
+                            sttResult = STTresult.objects.filter(audio_id = queueItem.audio_id)
+                            sdstt = sttResult.values_list('audio_id','slice_id','text')
+                            sttDf = read_frame(sdstt, fieldnames = ['audio_id','slice_id','text'])
+                            sttDf = uob_main.kyc_and_pii(sttDf, audio = queueItem)
+                        except Exception as e2:
+                            print('KYC+PII fails out of Exception:', type(e2), e2)
+                    else:
+                        print("Warning: "+"Audio "+queueItem.audio_id+" has been performed analysis of "+self.choices[i_int].analysis_name)
+                        continue
+
+                    # uob_storage.dbInsertPersonalInfo(finalDf=sttDf, audio_id=queueItem.audio_id)               
                     print("use KYC+PII ends")
                     print('*'*30)
                     
@@ -458,7 +462,7 @@ class AnalysisThread(threading.Thread):
             print('duration: ', endtime-starttime)
             
             ### * Save to Log Table
-            params = json.dumps({"NR":FLG_REDUCE_NOISE, "SE":FLG_SPEECH_ENHANCE, "SE_NEW":FLG_SPEECH_ENHANCE_NEW, "SR":FLG_SUPER_RES, "SD":sdModel, "STT":sttModel})
+            params = json.dumps({"NR":FLG_REDUCE_NOISE, "SD":sdModel, "STT":sttModel, "KYC+PII":'xxx'})
             analysis_name = json.dumps(self.json_analysis_selection)
             message = ''
             process_time = '{"starttime":"%s", "endtime":"%s", "duration":"%s"}'%(starttime,endtime,endtime-starttime)

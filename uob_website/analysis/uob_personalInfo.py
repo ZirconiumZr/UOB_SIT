@@ -2,10 +2,7 @@ import re
 import os
 import pandas as pd
 from text2digits import text2digits
-from flair.data import Sentence
-from flair.models import SequenceTagger
 from analysis.uob_init import(
-    pretrained_model_path,
     kyc_product_list
 )
 
