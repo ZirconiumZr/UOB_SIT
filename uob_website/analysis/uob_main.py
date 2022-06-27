@@ -242,7 +242,36 @@ def sd_and_stt(audio, starttime, analysis_name, username):
 
 
 
-def kyc_and_pii(sttDf, audio):
+def kyc_and_pii(sttDf, audio, analysis_name, username):
+    #### * Process PersonalInfo Detection
+    print('*'*30)
+    print("KYC & PII Detection Start")
     final = uob_personalInfo.personalInfoDetector(sttDf)
-    uob_storage.dbInsertPersonalInfo(finalDf=final, audio_id=audio.audio_id)   
+    print("KYC & PII Detection Done")
+    print('*'*30)
+    
+    
+    #### * Store output to database
+    print('*'*30)
+    print("Insert KYC & PII Output to Database Start")
+    uob_storage.dbInsertPersonalInfo(finalDf=final, audio_id=audio.audio_id)  
+     
+    analysis = json.loads(audio.analysis)
+    print('json object analysis:', analysis)
+    if analysis_name not in analysis.values():
+        analysis_key = int(max(analysis.keys()))+1 if analysis!={} else 0
+        analysis[analysis_key] = analysis_name
+    else:
+        print(analysis_name, 'has been done before')
+    analysis = json.dumps(analysis)
+    print('json string analysis:', analysis)
+    uob_storage.dbUpdateAudio_processedInfo(audio_id = audio.audio_id, 
+                                            username = username,
+                                            analysis = analysis
+                                            )
+    print("Insert KYC & PII Output to Database Done")
+    print('*'*30)
+    
+    
+    
     return final

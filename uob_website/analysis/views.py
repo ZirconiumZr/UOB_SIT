@@ -433,7 +433,7 @@ class AnalysisThread(threading.Thread):
                             sttResult = STTresult.objects.filter(audio_id = queueItem.audio_id)
                             sdstt = sttResult.values_list('audio_id','slice_id','text')
                             sttDf = read_frame(sdstt, fieldnames = ['audio_id','slice_id','text'])
-                            sttDf = uob_main.kyc_and_pii(sttDf, audio = queueItem)
+                            sttDf = uob_main.kyc_and_pii(sttDf, queueItem, self.choices[i_int].analysis_name, self.args['username'])
                         except Exception as e2:
                             print('KYC+PII fails out of Exception:', type(e2), e2)
                     else:
