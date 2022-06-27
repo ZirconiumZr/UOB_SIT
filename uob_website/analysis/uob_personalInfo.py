@@ -29,7 +29,7 @@ def personalInfoDetector(sttDf):
     piiList=[ ]
     list_of_sentences = sttDf['text'].values
     for i in range(len(list_of_sentences)):
-        if str(list_of_sentences[i]) != 'nan':
+        if str(list_of_sentences[i]):
             text = str(list_of_sentences[i])
             parsed_text = PiiRegex(text)
             if parsed_text.any_match():
