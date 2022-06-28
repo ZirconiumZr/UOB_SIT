@@ -132,10 +132,10 @@ DEFAULT_CHARSET = 'utf-8'
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'analysis/static'),
-]
-STATIC_ROOT = 'D:/EBAC/Internship/UOB/Projects/uob_web_SIT-copy/uob_website/analysis/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'analysis/static'),
+# ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'analysis/static')
 # MEDIA_ROOT = os.path.join(BASE_DIR,"analysis/audio/")  # new
 MEDIA_ROOT = 'D:/EBAC/Internship/UOB/Projects/uob_web_SIT-copy/audio/'
 MEDIA_URL='/audio/'  # new
