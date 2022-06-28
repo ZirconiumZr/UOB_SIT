@@ -46,7 +46,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for audio in audioList %}
+                        {% for audio in page_object %}
                         <tr {% if audio in audioList_unanalysis %} class="table-warning" {% elif audio in audioList_complete %} class="" {% else %} class="table-info" {% endif %}>
                             <td>
                                 <div class="form-check">
@@ -247,26 +247,6 @@
                             </div>
                         </div>
                     </form>
-
-
-                    <!-- ****** Pagination ****** -->
-                    {% comment %} 
-                    <div class="ms-auto">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item disabled">
-                                    <a class="page-link"> Previous </a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div> 
-                    {% endcomment %}
                 </div>
                 
             </form>
@@ -279,6 +259,25 @@
 
 </div>
 
+<!-- ****** Previous/Next Audio Report Buttons Group ****** -->
+<div class="pagination justify-content-center">
+    <span class="step-links">
+        {% if page_object.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_object.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_object.number }} of {{ page_object.paginator.num_pages }}.
+        </span>
+
+        {% if page_object.has_next %}
+            <a href="?page={{ page_object.next_page_number }}">next</a>
+            <a href="?page={{ page_object.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+<br>
 <!-- ****** Scroll Buttons ****** -->
 <div id="id_scrollBtns" style="position:fixed; right:0; bottom:0; float:right; z-index:9999;"> 
     <button type="button" class="btn btn-secondary" onclick="scrollToTop()"><span class="bi bi-caret-up-fill"></span></button>
