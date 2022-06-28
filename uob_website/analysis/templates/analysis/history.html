@@ -247,6 +247,37 @@
                             </div>
                         </div>
                     </form>
+
+
+                    <!-- ****** Pagination ****** -->
+                    <div class="ms-auto">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item">
+                                    <span class="align-middle">
+                                        Page {{ page_object.number }} of {{ page_object.paginator.num_pages }} &nbsp;&nbsp;
+                                    </span>
+                                </li>
+                                {% if page_object.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_object.previous_page_number }}">Previous</a>
+                                </li>
+                                {% endif %}
+                                {% if page_object.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_object.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_object.paginator.num_pages }}">Last &raquo;</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+
                 </div>
                 
             </form>
@@ -259,25 +290,6 @@
 
 </div>
 
-<!-- ****** Previous/Next Audio Report Buttons Group ****** -->
-<div class="pagination justify-content-center">
-    <span class="step-links">
-        {% if page_object.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_object.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_object.number }} of {{ page_object.paginator.num_pages }}.
-        </span>
-
-        {% if page_object.has_next %}
-            <a href="?page={{ page_object.next_page_number }}">next</a>
-            <a href="?page={{ page_object.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
-<br>
 <!-- ****** Scroll Buttons ****** -->
 <div id="id_scrollBtns" style="position:fixed; right:0; bottom:0; float:right; z-index:9999;"> 
     <button type="button" class="btn btn-secondary" onclick="scrollToTop()"><span class="bi bi-caret-up-fill"></span></button>
