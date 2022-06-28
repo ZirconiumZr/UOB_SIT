@@ -1,3 +1,0 @@
-text2digits
-flair
-django_pandas
