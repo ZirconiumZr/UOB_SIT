@@ -1,5 +1,7 @@
 from datetime import date
 import os
+import random
+import string
 import time
 import pymysql.cursors
 from pymysql.converters import escape_string
@@ -102,7 +104,8 @@ def dbInsertLog(audio_id, params, analysis_name, process_time, username=os.getlo
     
     with connection:
         with connection.cursor() as cursor:
-            log_id = 'log_'+time.strftime("%Y%m%d_%H%M%S")
+            randomStr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(8))
+            log_id = 'log_'+time.strftime("%Y%m%d_%H%M%S")+'_'+randomStr
             sql = "INSERT INTO `analysis_process_log` (`log_id`,`audio_id`,`params`,`analysis_name`,`process_time`,`create_by`,`create_on`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(sql, (log_id, audio_id, params, analysis_name, process_time, str(username),date.today()))
             
@@ -110,7 +113,7 @@ def dbInsertLog(audio_id, params, analysis_name, process_time, username=os.getlo
 
 def dbInsertPersonalInfo(finalDf, audio_id, username=os.getlogin()):
     connection= connectDB()
-
+    
     resultDf = finalDf
     with connection:
         with connection.cursor() as cursor:

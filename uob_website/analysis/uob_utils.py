@@ -111,7 +111,7 @@ def get_analysisSelections_json():
 
 
 
-def cleaning():
+def synchronize_analysis():
     ## All available analysis
     analysisSelections = AnalysisSelection.objects.all()
     json_analysisSelections = {}
@@ -136,13 +136,8 @@ def cleaning():
             
         
         ## 2. Synchronize audio.analysis and analysis result in corresponding table
-        
         sttResult_cnt = STTresult.objects.filter(audio_id = audioID).count()
         personalInfo_cnt = PersonalInfo.objects.filter(audio_id = audioID).count()
-        json_analysisSelections_list = list(json_analysisSelections.values())
-
-        print('sttResult_cnt:[{}]'.format(sttResult_cnt))
-        print('personalInfo_cnt:[{}]'.format(personalInfo_cnt))
         analysisDict = {}
         try:
             audio = Audio.objects.get(audio_id = audioID)
@@ -155,8 +150,6 @@ def cleaning():
                 piiSelec = {k:v for k,v in json_analysisSelections.items() if v=='KYC+PII'}
                 analysisDict.update(piiSelec)
             analysisDict_list = json.dumps(analysisDict)  
-            Audio.objects.filter(audio_id = audioID).update(analysis="%s"%analysisDict_list)
-
-                    
+            Audio.objects.filter(audio_id = audioID).update(analysis="%s"%analysisDict_list)  
         except Exception as e3:
             print('e3: ', e3)

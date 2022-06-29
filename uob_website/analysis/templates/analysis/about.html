@@ -6,14 +6,16 @@
 
 {% block content %}
 
-
 <div>
     <a href="{% url 'analysis:download_userguide' %}"><button type="button" class="btn btn-primary" id="btn_download_userguide">Download UserGuide</button></a>
 </div>
 <br>
 <div>
+    <a href="{% url 'analysis:synchronize_analysis' %}"><button type="button" class="btn btn-primary" id="btn_synchronize_analysis">Synchronize Audio Analysis Status</button></a>
+</div>
+<br>
+<div>
 <b>Describe the web portal here...</b>
 </div>
-
 
 {% endblock %}
