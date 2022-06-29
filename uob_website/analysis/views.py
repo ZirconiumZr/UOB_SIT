@@ -407,7 +407,7 @@ class AnalysisThread(threading.Thread):
             sttDf = pandas.DataFrame()
             for i in self.analysis_selected:
                 i_int = str(int(i))
-                self.json_analysis_selection[str(i_int)] = self.choices[i_int]  #example: {"0":"SD+STT", "1":"use case 1"}
+                self.json_analysis_selection[i_int] = self.choices[i_int]  #example: {"0":"SD+STT", "1":"use case 1"}
                 if self.choices[i_int] == 'SD+STT':
                     print('*'*30)
                     print("SD+STT starts")
