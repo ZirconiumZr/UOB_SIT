@@ -50,7 +50,7 @@ def main(request):
         num_audios_complete = Audio.objects.filter(flg_delete=None, create_by=str(request.user.username), analysis=json.dumps(json_analysisSelections)).count()
         num_audios_incomplete = num_audios - num_audios_unanalysis - num_audios_complete
 
-        
+
     context = {'num_audios': num_audios,
                'num_audios_all': num_audios_all,
                'num_audios_unanalysis': num_audios_unanalysis,
@@ -295,18 +295,16 @@ def history(request):
     ### Option 1: Using Windows Authentication
     # replace "request.user.username" with "os.getlogin()"
     ### Option 2: Using Django Authentication
-    analysisSelections = AnalysisSelection.objects.all()
-    json_analysisSelections = {}
-    for i in range(analysisSelections.count()):
-        json_analysisSelections["{}".format(i)] = analysisSelections[i].analysis_name
+    json_analysisSelections, json_analysisSelections_str, dict_analysisSelections = uob_utils.get_analysisSelections_json()
+
     if request.user.is_staff:
         audioList_unanalysis = Audio.objects.filter(flg_delete=None, analysis='{}').order_by('-audio_id')
         audioList = Audio.objects.filter(flg_delete=None).order_by('-audio_id')
-        audioList_complete = Audio.objects.filter(flg_delete=None, analysis=json.dumps(json_analysisSelections)).order_by('-audio_id')
+        audioList_complete = Audio.objects.filter(flg_delete=None, analysis=json_analysisSelections_str).order_by('-audio_id')
     else:
         audioList_unanalysis = Audio.objects.filter(flg_delete=None, create_by=str(request.user.username), analysis='{}').order_by('-audio_id')
         audioList = Audio.objects.filter(flg_delete=None, create_by=str(request.user.username)).order_by('-audio_id')
-        audioList_complete = Audio.objects.filter(flg_delete=None, create_by=str(request.user.username), analysis=json.dumps(json_analysisSelections)).order_by('-audio_id')
+        audioList_complete = Audio.objects.filter(flg_delete=None, create_by=str(request.user.username), analysis=json_analysisSelections_str).order_by('-audio_id')
 
     paginator = Paginator(audioList, 10)  # show 10 object per page
     if 'page' in request.GET:
